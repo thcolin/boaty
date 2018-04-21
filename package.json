@@ -1,0 +1,62 @@
+{
+  "name": "boaty",
+  "logo": "⛴️",
+  "version": "0.0.1",
+  "description": "🌊⛴️ A p2p cli boat - or client, will work with webtorrent and dat",
+  "main": "index.js",
+  "scripts": {
+    "build": "browserify packages/boaty-boat/index.js -o build/cli --bare -p [bannerify --template '#!/usr/bin/env node\n'] && chmod +x build/cli",
+    "start": "./build/cli",
+    "webtorrent:daemon": "./packages/boaty-webtorrent/daemon/index.js",
+    "debug": "tail -f ./debug.log | emojilog",
+    "playground": "browserify playground.js -o build/cli --bare -p [bannerify --template '#!/usr/bin/env node\n'] && chmod +x build/cli",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "browserify": {
+    "transform": [
+      "babelify"
+    ]
+  },
+  "keywords": [
+    "p2p",
+    "webtorrent",
+    "dat",
+    "cli",
+    "blessed",
+    "react"
+  ],
+  "author": "thcolin",
+  "homepage": "https://github.com/thcolin/boaty",
+  "license": "ISC",
+  "dependencies": {
+    "@studio/log": "^1.7.4",
+    "blessed": "^0.1.81",
+    "blessed-contrib": "^4.8.5",
+    "bufferutil": "^3.0.3",
+    "humanize": "0.0.9",
+    "oleoo": "^1.0.3",
+    "pty": "0.0.0",
+    "react": "^16.3.0",
+    "react-blessed": "^0.2.1",
+    "react-blessed-contrib": "^0.2.1",
+    "react-redux": "^5.0.7",
+    "redux": "^3.7.2",
+    "redux-observable": "^0.18.0",
+    "rxjs": "^5.5.8",
+    "term.js": "0.0.7",
+    "utf-8-validate": "^4.0.0",
+    "webtorrent": "^0.98.24",
+    "ws": "^5.1.1"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-plugin-module-resolver": "^3.1.1",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "babelify": "^8.0.0",
+    "bannerify": "^1.0.1",
+    "browserify": "^16.2.0"
+  }
+}

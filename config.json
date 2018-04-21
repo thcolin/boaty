@@ -1,0 +1,12 @@
+{
+  "@boaty/boat": {
+    "workspace": [
+      {
+        "component": "@boaty/webtorrent",
+        "props": {
+          "key": "pane-webtorrent"
+        }
+      }
+    ]
+  }
+}

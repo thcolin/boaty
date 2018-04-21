@@ -1,0 +1,12 @@
+{
+  "presets": ["env", "react", "stage-0"],
+  "plugins": [
+    ["module-resolver", {
+      "root": ["./packages"],
+      "alias": {
+        "@boaty/boat": "./packages/boaty-boat",
+        "@boaty/webtorrent": "./packages/boaty-webtorrent"
+      }
+    }]
+  ]
+}

@@ -1,0 +1,6 @@
+node_modules
+build
+playground.js
+debug.log
+*.torrent
+torrents.json
