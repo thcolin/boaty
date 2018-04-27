@@ -3,7 +3,7 @@ import Rx from 'rxjs'
 import service from '@boaty/webtorrent/store/service'
 import * as paneDuck from '@boaty/webtorrent/store/ducks/pane'
 
-const INTERVAL = 3000
+const INTERVAL = 1000
 
 // Actions
 export const FILL_TORRENTS = 'boaty/webtorrent/FILL_TORRENTS'

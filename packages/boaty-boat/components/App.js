@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import Header from '@boaty/boat/components/Header'
 import Footer from '@boaty/boat/components/Footer'
 import transform from '@boaty/boat/utils/transform'
-import config from '@boaty/boat/singletons/config'
+import config from '@boaty/boat/services/config'
 
 export default class App extends Component {
   render() {

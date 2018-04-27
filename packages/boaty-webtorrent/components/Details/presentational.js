@@ -1,31 +1,41 @@
 import React, { Component } from 'react'
 import Rx from 'rxjs'
 import humanize from 'humanize'
-import tabulator from '@boaty/boat/singletons/tabulator'
+import tabulator from '@boaty/boat/services/tabulator'
 
-const COMPONENT = 'webtorrent/details'
-const style = state => ({
-  height: '100%',
-  width: '100%',
-  fg: 'white',
-  align: 'left',
-  noCellBorders: true,
-  border: {
-    type: 'line',
-  },
-  style: {
-    cell: {
-      selected: {
-        bold: true
-      }
-    },
+const style = (state, props) => ({
+  container: {
+    top: props.style.top,
+    height: props.style.height,
+    width: '100%',
     border: {
-      fg: state.focused ? 'blue' : 'grey'
+      type: 'line',
     },
+    style: {
+      border: {
+        fg: state.focused ? 'blue' : 'grey'
+      },
+    }
+  },
+  list: {
+    height: props.opened ? '100%-2' : 0,
+    width: '100%-2',
+    fg: 'white',
+    align: 'left',
+    noCellBorders: true,
+    style: {
+      cell: {
+        selected: {
+          bold: true
+        }
+      },
+    }
   }
 })
 
 export default class Details extends Component {
+  static uri = '@boaty/webtorrent/details'
+
   constructor(props) {
     super(props)
 
@@ -39,6 +49,10 @@ export default class Details extends Component {
     }
 
     this.handleMove = this.handleMove.bind(this)
+  }
+
+  componentWillMount() {
+    tabulator.register(Details.uri).takeWhile(() => this.refs.self).subscribe(() => this.refs.self.focus())
   }
 
   componentDidMount() {
@@ -59,11 +73,6 @@ export default class Details extends Component {
     // Focus
     Rx.Observable.merge(focus$.mapTo(true), blur$.mapTo(false))
       .subscribe(focused => this.setState({ focused }))
-
-    // Tabulator
-    tabulator
-      .register(COMPONENT)
-      .subscribe(() => this.refs.self.focus())
   }
 
   shouldComponentUpdate(props, state) {
@@ -85,14 +94,17 @@ export default class Details extends Component {
   }
 
   shapize(item) {
+    const width = Math.max(0, ((this.refs.self || {}).width || 0) - 4)
+    const pad = 14
+
     if (!item) {
       return [
         ['Loading...']
       ]
     }
 
-    return ([
-      ['{bold}Name{/bold}', item.name],
+    const rows = ([
+      ['{bold}Torrent{/bold}', item.name],
       ['{bold}Created{/bold}', humanize.date('d/m/Y - h:m:s', new Date(item.created))],
       ['{bold}Size{/bold}', humanize.filesize(item.total)],
       ['{bold}Progress{/bold}', `${humanize.numberFormat(item.progress * 100)}% (${humanize.filesize(item.downloaded)} of ${humanize.filesize(item.total)})`],
@@ -103,7 +115,12 @@ export default class Details extends Component {
       ['{bold}Directory{/bold}', item.path],
       ['{bold}Ratio{/bold}', humanize.numberFormat(item.ratio).toString()],
       ['{bold}Peers{/bold}', item.peers.toString()],
-    ]).concat(item.files.map((file, i) => [!i ? '{bold}Files(s){/bold}' : '', file]))
+    ])
+
+    return rows.map(row => {
+      row[1] = row[1].padEnd(width - pad, ' ')
+      return row
+    })
   }
 
   render() {
@@ -111,15 +128,16 @@ export default class Details extends Component {
     const rows = this.shapize(item)
 
     return (
-      <listtable
-        // label="Details"
-        ref="self"
-        keys={true}
-        scroll={true}
-        tags={true}
-        rows={rows}
-        {...style(this.state)}
-      />
+      <box label="Details" {...style(this.state, this.props).container}>
+        <listtable
+          ref="self"
+          keys={true}
+          scroll={true}
+          tags={true}
+          rows={rows}
+          {...style(this.state, this.props).list}
+        />
+      </box>
     )
   }
 }

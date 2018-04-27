@@ -5,7 +5,7 @@ import { Provider } from 'react-redux'
 import App from '@boaty/boat/components/App'
 import Safer from '@boaty/boat/components/Safer'
 import store from '@boaty/boat/store'
-import screen from '@boaty/boat/singletons/screen'
+import screen from '@boaty/boat/services/screen'
 import logger from '@boaty/boat/utils/logger'
 
 logger.launch('Booted !')

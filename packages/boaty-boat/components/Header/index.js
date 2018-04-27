@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import context from '@boaty/boat/singletons/context'
+import context from '@boaty/boat/services/context'
 
 export default class Header extends Component {
   constructor(props) {

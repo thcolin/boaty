@@ -1,5 +1,5 @@
 import Rx from 'rxjs'
-import screen from '@boaty/boat/singletons/screen'
+import screen from '@boaty/boat/services/screen'
 import logger from '@boaty/boat/utils/logger'
 
 let current = 0
@@ -12,11 +12,19 @@ screen.key(['tab'], (ch, key) => {
 })
 
 const tabulator = {
-  register: component => {
+  register: (component, autofocus = false) => {
     components.push(component)
+
+    if (autofocus) {
+      setTimeout(() => subject.next(component), 200)
+    }
+
+    logger.broadcast('Register', component)
     return subject.filter(next => next === component)
   },
-  push: component => subject.next(component)
+  rescind: component => components.splice(components.indexOf(component), 1),
+  push: component => subject.next(component),
+  listen: () => subject
 }
 
 export default tabulator

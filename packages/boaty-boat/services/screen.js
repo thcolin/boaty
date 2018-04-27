@@ -1,5 +1,5 @@
 import blessed from 'blessed'
-import context from '@boaty/boat/singletons/context'
+import context from '@boaty/boat/services/context'
 
 const screen = blessed.screen({
   autoPadding: true,

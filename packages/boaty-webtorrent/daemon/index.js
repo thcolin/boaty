@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const WebTorrent = require('webtorrent')
 const WebSocket = require('ws')
+const fs = require('fs')
 const path = require('path')
 const logger = require('@studio/log')
 const fancy = require('@studio/log/format/fancy')
@@ -8,7 +9,10 @@ const torrents = require('./torrents.json')
 
 const PORT = 9876
 
-logger.transform(fancy()).out(process.stdout)
+const debugfile = fs.createWriteStream(path.join(__dirname, 'debug.log'))
+const argv = require('minimist')(process.argv.slice(2))
+
+logger.transform(fancy()).out(argv.quiet ? debugfile : process.stdout)
 
 const loggers = {
   webtorrent: logger('[WebTorrent]'),
@@ -64,6 +68,7 @@ wss.on('connection', (ws) => {
           ratio: torrent.ratio,
           peers: torrent.numPeers,
           files: torrent.files.map(file => file.path),
+          pieces: torrent.pieces.map(piece => (piece === null || piece.missing === 0) ? 1 : (piece.ongoing < piece.length ? 0 : -1)),
         }))
 
         response = { torrents }

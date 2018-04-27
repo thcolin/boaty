@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
-import context from '@boaty/boat/singletons/context'
+import context from '@boaty/boat/services/context'
 
 export default class Footer extends Component {
   render() {
     const commands = {
       'Tab': 'Switch',
-      '↓↑': 'Move'
+      '↓↑': 'Move',
+      'q': 'Quit',
     }
 
     return (
