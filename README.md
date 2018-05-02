@@ -1,7 +1,9 @@
 # 🌊⛴️ Boaty
 A peer-2-peer cli boat - or client, will work with webtorrent and dat
 
-![Boaty - Screenshot](https://raw.githubusercontent.com/thcolin/boaty/master/screenshot.svg)
+<p align="center">
+  <img width="800" title="Boaty - Screenshot" src="https://cdn.rawgit.com/thcolin/boaty/master/screenshot.svg">
+</p>
 
 ## Run
 How to run it ? - Hope to release it packaged to `brew` soon
