@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import Details from '@boaty/webtorrent/components/Details'
 import Pieces from '@boaty/webtorrent/components/Pieces'
-import tabulator from '@boaty/boat/services/tabulator'
+import router from '@boaty/boat/services/router'
 
 const style = (state) => ({
   top: state.index > state.opened ? `100%-${(state.length - state.index) + 1}` : state.index,
@@ -18,7 +18,7 @@ export default class Drawer extends Component {
   }
 
   componentWillMount() {
-    tabulator
+    router
       .listen()
       .filter(uri => this.props.components.map(component => component.uri).includes(uri))
       .subscribe(uri => this.setState({

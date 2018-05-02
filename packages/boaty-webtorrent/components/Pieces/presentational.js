@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import Rx from 'rxjs'
-import tabulator from '@boaty/boat/services/tabulator'
+import router from '@boaty/boat/services/router'
+import logger from '@boaty/boat/utils/logger'
 
 const style = (state, props) => ({
   top: props.style.top,
@@ -30,7 +31,7 @@ export default class Pieces extends Component {
   }
 
   componentWillMount() {
-    tabulator.register(Pieces.uri).takeWhile(() => this.refs.self).subscribe(() => this.refs.self.focus())
+    router.register(Pieces.uri).takeWhile(() => this.refs.self).subscribe(() => this.refs.self.focus())
   }
 
   componentDidMount() {
@@ -44,10 +45,11 @@ export default class Pieces extends Component {
   }
 
   componentWillUnmount() {
-    tabulator.rescind(Pieces.uri)
+    router.rescind(Pieces.uri)
   }
 
   render() {
+    logger.ignore('Render', Pieces.uri, [this.props.pieces.length])
     const { pieces } = this.props
 
     return (

@@ -1,7 +1,10 @@
 import React, { Component } from 'react'
 import Rx from 'rxjs'
 import humanize from 'humanize'
-import tabulator from '@boaty/boat/services/tabulator'
+import p from 'path'
+import opn from 'opn'
+import router from '@boaty/boat/services/router'
+import logger from '@boaty/boat/utils/logger'
 
 const style = (state, props) => ({
   container: {
@@ -46,10 +49,11 @@ export default class Files extends Component {
     }
 
     this.handleMove = this.handleMove.bind(this)
+    this.handleSelect = this.handleSelect.bind(this)
   }
 
   componentWillMount() {
-    tabulator.register(Files.uri).takeWhile(() => this.refs.self).subscribe(() => this.refs.self.focus())
+    router.register(Files.uri).takeWhile(() => this.refs.self).subscribe(() => this.refs.self.focus())
   }
 
   componentDidMount() {
@@ -64,12 +68,18 @@ export default class Files extends Component {
     const focus$ = Rx.Observable
       .fromEvent(this.refs.self, 'element focus')
 
+    const select$ = Rx.Observable
+      .fromEvent(this.refs.self, 'select')
+
     // Move
     move$.subscribe(this.handleMove)
 
     // Focus
     Rx.Observable.merge(focus$.mapTo(true), blur$.mapTo(false))
       .subscribe(focused => this.setState({ focused }))
+
+    // Select
+    select$.subscribe(this.handleSelect)
   }
 
   componentDidUpdate() {
@@ -82,8 +92,21 @@ export default class Files extends Component {
     this.position.scroll = event.el.getScrollPerc()
   }
 
+  handleSelect(item) {
+    const content = item.content.trim()
+    const value = content === this.props.path ? content : p.join(this.props.path, content)
+    logger.spawn('Files', value)
+    opn(value)
+  }
+
+  shapize(path, files) {
+    return [path].concat(files.map(file => ` ${['.', file].join(p.sep)}`))
+  }
+
   render() {
-    const { files } = this.props
+    logger.ignore('Render', Files.uri, [this.props.path])
+    const { path, files } = this.props
+    const rows = this.shapize(path, files)
 
     return (
       <box label="Files" {...style(this.state, this.props).container}>
@@ -92,7 +115,7 @@ export default class Files extends Component {
           keys={true}
           interactive={true}
           tags={true}
-          items={files}
+          items={rows}
           {...style(this.state, this.props).list}
         />
       </box>

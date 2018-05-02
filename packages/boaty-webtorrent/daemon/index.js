@@ -1,96 +1,75 @@
 #!/usr/bin/env node
-const WebTorrent = require('webtorrent')
-const WebSocket = require('ws')
-const fs = require('fs')
-const path = require('path')
-const logger = require('@studio/log')
-const fancy = require('@studio/log/format/fancy')
-const torrents = require('./torrents.json')
-
 const PORT = 9876
+const WebSocket = require('ws')
+const Rx = require('rxjs')
 
-const debugfile = fs.createWriteStream(path.join(__dirname, 'debug.log'))
 const argv = require('minimist')(process.argv.slice(2))
-
-logger.transform(fancy()).out(argv.quiet ? debugfile : process.stdout)
-
-const loggers = {
-  webtorrent: logger('[WebTorrent]'),
-  daemon: logger('[Daemon]'),
-  socket: logger('[Socket]'),
-}
+const loggers = require('./loggers')(argv)
 
 loggers.webtorrent.launch('Booting...')
-const wtc = new WebTorrent()
+const client = require('./client')
+const store = require('./store.json')
 
-torrents.forEach(torrent => {
-  loggers.webtorrent.spawn('Loading', `${torrent.type === 'fs' ? path.basename(torrent.uri) : torrent.uri}`)
-  wtc.add(torrent.uri)
-})
+store.forEach(row => loggers.webtorrent.spawn('Loading', row.name))
+client.bootstrap(store)
 
+const server = new WebSocket.Server({ port: PORT })
+const transport = require('./transport')
+const actions = require('../actions')
 loggers.webtorrent.finish('Booted !')
 
-loggers.daemon.launch('Booting...')
-const wss = new WebSocket.Server({ port: PORT })
-loggers.daemon.finish('Booted !')
-
-wss.on('connection', (ws) => {
+server.on('connection', (socket) => {
   loggers.socket.fetch('Connected !')
 
-  ws.on('message', payload => {
-    const data = decode(payload)
-    let response
-    loggers.socket.input(data.method || 'UNKNOWN', data)
+  const dispatch = (feedback) => socket.readyState === WebSocket.OPEN && socket.send(transport.encode(feedback))
+  const close$ = new Rx.Subject()
 
-    switch (data.method) {
-      case 'TORRENT':
-      break
-      case 'RESUME':
-      break
-      case 'PAUSE':
-      break
-      case 'TORRENTS':
-        const torrents = wtc.torrents.map(torrent => ({
-          hash: torrent.infoHash,
-          name: torrent.name,
-          announce: torrent.announce,
-          path: torrent.path,
-          created: torrent.created,
-          paused: torrent.paused,
-          done: torrent.done,
-          timeRemaining: torrent.timeRemaining,
-          total: torrent.length,
-          downloaded: torrent.downloaded,
-          uploaded: torrent.uploaded,
-          downloadSpeed: torrent.downloadSpeed,
-          uploadSpeed: torrent.uploadSpeed,
-          progress: torrent.progress,
-          ratio: torrent.ratio,
-          peers: torrent.numPeers,
-          files: torrent.files.map(file => file.path),
-          pieces: torrent.pieces.map(piece => (piece === null || piece.missing === 0) ? 1 : (piece.ongoing < piece.length ? 0 : -1)),
-        }))
+  socket.on('close', () => {
+    loggers.socket.terminate('Disconnected !')
+    close$.next(true)
+  })
 
-        response = { torrents }
-      break
-    }
+  socket.on('message', payload => {
+    const action = transport.decode(payload)
+    loggers.socket.input(action.type, action)
 
-    if (response) {
-      loggers.socket.output(data.method, response)
-      ws.send(encode(data.id, data.method, response))
+    switch (action.type) {
+      case actions.OBSERVE_STATS: {
+        let memory = {}
+
+        Rx.Observable
+          .timer(0, 5000)
+          .map(() => client.stats())
+          .filter(stats => !Object.keys(stats).every(key => stats[key] === memory[key]))
+          .do(stats => memory = stats)
+          .takeUntil(close$)
+          .subscribe((stats) => {
+            const feedback = actions.fillStats(stats)
+            dispatch(feedback)
+            loggers.socket.output(feedback.type, Object.keys(feedback.stats))
+          })
+        break
+      }
+
+      case actions.FETCH_TORRENTS: {
+        const feedback = actions.fillTorrents(client.all())
+        dispatch(feedback)
+        loggers.socket.output(feedback.type)
+        break
+      }
+
+      case actions.OBSERVE_TORRENTS: {
+        Rx.Observable.merge(...client.all(true).map(torrent => client.listen(torrent.infoHash, 1000)))
+          .takeUntil(close$)
+          .bufferTime(1000)
+          .filter(group => group.length)
+          .subscribe((group) => {
+            const feedback = actions.amendTorrents(group)
+            dispatch(feedback)
+            loggers.socket.output(feedback.type, group.length)
+          })
+        break
+      }
     }
   })
 })
-
-function encode(id, method, result = {}) {
-  return JSON.stringify({
-    jsonrpc: '2.0',
-    id,
-    method,
-    result,
-  })
-}
-
-function decode(payload) {
-  return JSON.parse(payload)
-}

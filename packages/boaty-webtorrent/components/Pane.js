@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
+import Drawer from '@boaty/boat/components/Drawer'
 import Torrents from '@boaty/webtorrent/components/Torrents'
-import Drawer from '@boaty/webtorrent/components/Drawer'
 import Details from '@boaty/webtorrent/components/Details'
 import Files from '@boaty/webtorrent/components/Files'
 import Pieces from '@boaty/webtorrent/components/Pieces'

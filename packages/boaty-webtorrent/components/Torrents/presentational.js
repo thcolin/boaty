@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import Rx from 'rxjs'
 import humanize from 'humanize'
-import tabulator from '@boaty/boat/services/tabulator'
+import router from '@boaty/boat/services/router'
 import logger from '@boaty/boat/utils/logger'
 
 const style = state => ({
@@ -22,14 +22,9 @@ const style = state => ({
     height: '100%-2',
     width: '100%-4',
     noCellBorders: true,
-    // align: 'left',
     pad: 4,
     style: {
-      header: {
-        // align: 'center',
-      },
       cell: {
-        // align: 'left',
         selected: {
           fg: 'black',
           bg: 'brightwhite'
@@ -60,7 +55,7 @@ export default class Torrents extends Component {
   }
 
   componentWillMount() {
-    tabulator.register(Torrents.uri, true).subscribe(() => this.refs.self.focus())
+    router.register(Torrents.uri, true).subscribe(() => this.refs.self.focus())
   }
 
   componentDidMount() {
@@ -84,7 +79,6 @@ export default class Torrents extends Component {
       move$
         .sample(blur$)
     )
-    .do(() => this.props.onUnfreeze())
     .subscribe(this.handleSelect)
 
     // Focus
@@ -99,26 +93,27 @@ export default class Torrents extends Component {
 
   handleSelect(event) {
     this.props.onSelect(event.el.selected - 1) // remove headers row
+    this.props.onUnfreeze()
   }
 
-  shapize(items) {
-    const width = Math.max(0, ((this.refs.self || {}).width || 0) - 4)
+  shapize(torrents) {
+    const width = Math.max(0, ((this.refs.self || {}).width || 0) - 2)
 
-    if (!items.result.length) {
+    if (!torrents.length) {
       return [
         ['Loading'],
         ['Loading...']
       ]
     }
 
-    const rows = items.result.map(key => items.entities[key]).map(item => [
-      (item.done ? '✔' : item.paused ? '◼' : '▶'),
-      item.name,
-      (item.done || item.paused ? '-' : `${humanize.filesize(item.downloadSpeed)}/s`.replace(/bytes/g, 'b')),
-      `${humanize.filesize(item.uploadSpeed)}/s`.replace(/bytes/g, 'b'),
-      `${humanize.numberFormat(item.progress * 100, 0)}%`,
-      humanize.filesize(item.total),
-      item.done ? '-' : item.paused ? '-' : typeof item.timeRemaining === 'number' ? humanize.relativeTime((Date.now() + item.timeRemaining) / 1000).substring(3) : '∞',
+    const rows = torrents.map(torrent => [
+      (torrent.done ? '✔' : torrent.paused ? '◼' : '▶'),
+      torrent.name,
+      (torrent.done || torrent.paused ? '-' : humanize.speed(torrent.downloadSpeed)),
+      humanize.speed(torrent.uploadSpeed),
+      `${humanize.numberFormat(torrent.progress * 100, 0)}%`,
+      humanize.filesize(torrent.total),
+      torrent.done ? '-' : torrent.paused ? '-' : typeof torrent.timeRemaining === 'number' ? humanize.relativeTime((Date.now() + torrent.timeRemaining) / 1000).substring(3) : '∞',
     ])
 
     const pad = rows.reduce((total, row) => {
@@ -129,14 +124,15 @@ export default class Torrents extends Component {
     return [['?', 'Name', '↓', '↑', '%', '#', '@']].concat(rows.map(row => {
       const name = row[1]
       const ellipsed = (name.length > (width - pad) ? `${name.substring(0, (width - pad)).trim()}...` : name)
-      row[1] = ellipsed.padEnd(width + style({}).table.pad - pad, ' ')
+      row[1] = ellipsed.padEnd(width - pad, ' ')
       return row
     }))
   }
 
   render() {
-    const { payload } = this.props
-    const rows = this.shapize(payload)
+    logger.ignore('Render', Torrents.uri, [this.props.selected])
+    const { torrents } = this.props
+    const rows = this.shapize(torrents)
 
     return (
       <box label="Torrents" {...style(this.state).container}>

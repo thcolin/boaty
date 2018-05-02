@@ -1,6 +1,6 @@
 import { combineReducers, compose, applyMiddleware, createStore } from 'redux'
 import { combineEpics, createEpicMiddleware } from 'redux-observable'
-import { reducer as pane, initPane } from '@boaty/webtorrent/store/ducks/pane'
+import { reducer as pane, epic as paneEpic, initPane } from '@boaty/webtorrent/store/ducks/pane'
 import { reducer as torrents, epic as torrentsEpic } from '@boaty/webtorrent/store/ducks/torrents'
 
 const reducer = combineReducers({
@@ -9,7 +9,8 @@ const reducer = combineReducers({
 })
 
 const epic = combineEpics(
-  torrentsEpic
+  paneEpic,
+  torrentsEpic,
 )
 
 const middleware = compose(applyMiddleware(createEpicMiddleware(epic)))

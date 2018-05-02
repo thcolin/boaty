@@ -1,8 +1,10 @@
 import { connect } from 'react-redux'
+import { siftedTorrentsSelector } from '@boaty/webtorrent/store/ducks/torrents'
 import Files from './presentational'
 
 const mapStateToProps = (state) => ({
-  files: (state.torrents.torrents.entities[state.torrents.torrents.result[state.torrents.selected]] || {}).files || [],
+  path: (siftedTorrentsSelector(state) || {}).path || '',
+  files: (siftedTorrentsSelector(state) || {}).files || [],
 })
 
 export default connect(

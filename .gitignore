@@ -3,5 +3,5 @@ build
 playground.js
 debug.log
 *.torrent
-torrents.json
+store.json
 .DS_Store

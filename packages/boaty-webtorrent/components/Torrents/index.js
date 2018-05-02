@@ -1,15 +1,16 @@
 import { connect } from 'react-redux'
-import { selectTorrent } from '@boaty/webtorrent/store/ducks/torrents'
+import { partialTorrentsSelector } from '@boaty/webtorrent/store/ducks/torrents'
+import { siftTorrents } from '@boaty/webtorrent/actions'
 import { freezePane, unfreezePane } from '@boaty/webtorrent/store/ducks/pane'
 import Torrents from './presentational'
 
 const mapStateToProps = (state) => ({
   selected: state.torrents.selected,
-  payload: state.torrents.torrents,
+  torrents: partialTorrentsSelector(state),
 })
 
 const mapDispatchToProps = (dispatch) => ({
-  onSelect: (index) => dispatch(selectTorrent(index)),
+  onSelect: (index) => dispatch(siftTorrents(index)),
   onFreeze: () => dispatch(freezePane()),
   onUnfreeze: () => dispatch(unfreezePane()),
 })

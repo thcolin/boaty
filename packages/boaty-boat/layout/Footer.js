@@ -1,11 +1,19 @@
 import React, { Component } from 'react'
 import context from '@boaty/boat/services/context'
+import { connect } from 'react-redux'
+import { onlineSelector } from '@boaty/boat/store/ducks/app'
 
-export default class Footer extends Component {
+const mapStateToProps = (state) => ({
+  online: onlineSelector(state),
+})
+
+class Footer extends Component {
   render() {
+    const { online } = this.props
     const commands = {
       'Tab': 'Switch',
       '↓↑': 'Move',
+      'Enter': 'Open',
       'q': 'Quit',
     }
 
@@ -19,14 +27,15 @@ export default class Footer extends Component {
         <text
           tags={true}
           left="center"
-          content={[`{bold}∞{/bold} ↓ 12.5 Mb/s ↑ 7.32 Mb/s`, `{bold}#{/bold} ↓ 23.63 Tb ↑ 377.32 Tb`].join('  -  ')}
         />
         <text
           tags={true}
           right={0}
-          content={context.homepage}
+          content={`${context.homepage} - ${online ? '⛅ ' : '⛈️ '}`}
         />
       </box>
     )
   }
 }
+
+export default connect(mapStateToProps)(Footer)

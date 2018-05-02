@@ -1,7 +1,14 @@
 import React, { Component } from 'react'
+import { connect } from 'react-redux'
+import { statsSelector } from '@boaty/boat/store/ducks/app'
+import humanize from 'humanize'
 import context from '@boaty/boat/services/context'
 
-export default class Header extends Component {
+const mapStateToProps = (state) => ({
+  stats: statsSelector(state),
+})
+
+class Header extends Component {
   constructor(props) {
     super(props)
 
@@ -15,6 +22,8 @@ export default class Header extends Component {
   }
 
   render() {
+    const { stats } = this.props
+
     return (
       <box>
         <text
@@ -25,7 +34,7 @@ export default class Header extends Component {
         <text
           tags={true}
           left="center"
-          content={`{bold}Speed Average: ↓ 12.5 Mb/s ↑ 7.32 Mb/s{/bold}`}
+          content={`{bold}↓ ${humanize.speed(stats.down)} ↑ ${humanize.speed(stats.up)} ~ ${humanize.numberFormat(stats.ratio, 2)}{/bold}`}
         />
         <text
           tags={true}
@@ -40,3 +49,5 @@ export default class Header extends Component {
     )
   }
 }
+
+export default connect(mapStateToProps)(Header)

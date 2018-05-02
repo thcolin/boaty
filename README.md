@@ -1,7 +1,7 @@
 # 🌊⛴️ Boaty
 A peer-2-peer cli boat - or client, will work with webtorrent and dat
 
-![Boaty - Screenshot](https://raw.githubusercontent.com/thcolin/boaty/master/screenshot.gif)
+![Boaty - Screenshot](https://raw.githubusercontent.com/thcolin/boaty/master/screenshot.svg)
 
 ## Run
 How to run it ? - Hope to release it packaged to `brew` soon
@@ -18,9 +18,12 @@ See below for available `panes`:
 * [x] WebTorrent (`@boaty/webtorrent`)
   * [x] List
   * [x] Details
+  * [x] Files
   * [x] Release
-  * [x] Pieces (blocks like FlashGet ❤️, cf. `vtop` diagram)
+  * [x] Pieces (blocks like FlashGet ❤️)
+  * [ ] Stream (?)
   * [ ] Speeds (cf. `vtop` diagram)
+    * Use `sparkline` blessed-contrib type ?
   * [ ] Actions (pause-resume/open/delete/erase)
   * [ ] Configuration (?)
 * [ ] Dat (`@boaty/dat`)
@@ -60,22 +63,23 @@ You can customize your configuration in `config.json` file:
 ```
 
 # Keys
-* `Tab`: Switch between tiles
+* `Tab`: Switch between tiles (use `Shift` key for opposite direction)
 * `↓↑`: Move
+* `Enter`: Open (folders and files in `Files` tile)
 * `Esc|q`: Quit
 
+# About
+* `Footer`:
+  * ⛅ Online / ⛈️ Offline
+
+# Help
+* Rendering `screenshot.svg` from `asciinema`: `svg-term --cast=CAST_ID --out screenshot.svg --term=iterm2 --profile=~/.itermcolors --window`
+
 # Roadmap
+* Implement `standardjs`
+* Write `tests`
 * Improve `config.json`
   * `@boaty/webtorrent`
     * see [Transmission](https://github.com/transmission/transmission/wiki/Editing-Configuration-Files)
-* `@boaty/boat`
-  * Enable `Shift+Tab` in `tabulator`
-  * Use `loading` blessed type until app is ready
-  * Fix `Header` and `Footer` data
 * `@boaty/webtorrent`
-  * Implement `open` on `Details/Directory` and `Files/*`
-  * Split stable/unstable from `Details` in two components
-  * Cache data (like `release`)
-  * Refine `reducer` splitting
-    * by `torrent`
-    * and by `key` updated (?)
+  * Use `@boaty/boat/Spinner` component will other components are loading

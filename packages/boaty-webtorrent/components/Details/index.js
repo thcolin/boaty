@@ -1,8 +1,9 @@
 import { connect } from 'react-redux'
+import { siftedTorrentsSelector } from '@boaty/webtorrent/store/ducks/torrents'
 import Details from './presentational'
 
 const mapStateToProps = (state) => ({
-  item: state.torrents.torrents.entities[state.torrents.torrents.result[state.torrents.selected]],
+  item: siftedTorrentsSelector(state) || null,
 })
 
 export default connect(

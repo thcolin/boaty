@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import Header from '@boaty/boat/components/Header'
-import Footer from '@boaty/boat/components/Footer'
+import Header from '@boaty/boat/layout/Header'
+import Footer from '@boaty/boat/layout/Footer'
 import transform from '@boaty/boat/utils/transform'
 import config from '@boaty/boat/services/config'
 

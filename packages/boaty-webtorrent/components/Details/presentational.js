@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import Rx from 'rxjs'
 import humanize from 'humanize'
-import tabulator from '@boaty/boat/services/tabulator'
+import router from '@boaty/boat/services/router'
+import logger from '@boaty/boat/utils/logger'
 
 const style = (state, props) => ({
   container: {
@@ -52,7 +53,7 @@ export default class Details extends Component {
   }
 
   componentWillMount() {
-    tabulator.register(Details.uri).takeWhile(() => this.refs.self).subscribe(() => this.refs.self.focus())
+    router.register(Details.uri).takeWhile(() => this.refs.self).subscribe(() => this.refs.self.focus())
   }
 
   componentDidMount() {
@@ -110,12 +111,10 @@ export default class Details extends Component {
       ['{bold}Progress{/bold}', `${humanize.numberFormat(item.progress * 100)}% (${humanize.filesize(item.downloaded)} of ${humanize.filesize(item.total)})`],
       ['{bold}Uploaded{/bold}', humanize.filesize(item.uploaded)],
       ['{bold}Remaining{/bold}', item.done ? 'Done' : item.paused ? 'Paused' : typeof item.timeRemaining === 'number' ? humanize.relativeTime((Date.now() + item.timeRemaining) / 1000).substring(3) : '∞'],
-      ['{bold}Speed{/bold}', `↓ ${humanize.filesize(item.downloadSpeed)}/s - ↑ ${humanize.filesize(item.uploadSpeed)}/s`],
-    ]).concat(item.announce.map((announce, i) => [!i ? '{bold}Announce(s){/bold}' : '', announce])).concat([
-      ['{bold}Directory{/bold}', item.path],
+      ['{bold}Speed{/bold}', `↓ ${humanize.speed(item.downloadSpeed)} - ↑ ${humanize.speed(item.uploadSpeed)}`],
       ['{bold}Ratio{/bold}', humanize.numberFormat(item.ratio).toString()],
       ['{bold}Peers{/bold}', item.peers.toString()],
-    ])
+    ]).concat(item.announce.map((announce, i) => [!i ? '{bold}Announce(s){/bold}' : '', announce]))
 
     return rows.map(row => {
       row[1] = row[1].padEnd(width - pad, ' ')
@@ -124,6 +123,7 @@ export default class Details extends Component {
   }
 
   render() {
+    logger.ignore('Render', Details.uri, [this.props.name])
     const { item } = this.props
     const rows = this.shapize(item)
 

@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import Rx from 'rxjs'
-import tabulator from '@boaty/boat/services/tabulator'
+import router from '@boaty/boat/services/router'
 import oleoo from 'oleoo'
+import logger from '@boaty/boat/utils/logger'
 
 const COMPONENT = 'webtorrent/release'
 const style = (state, props) => ({
@@ -59,7 +60,7 @@ export default class Release extends Component {
   }
 
   componentWillMount() {
-    tabulator.register(Release.uri).subscribe(() => this.refs.self.focus())
+    router.register(Release.uri).subscribe(() => this.refs.self.focus())
   }
 
   shapize (name) {
@@ -118,6 +119,7 @@ export default class Release extends Component {
   }
 
   render () {
+    logger.ignore('Render', Release.uri, [this.props.name])
     const { name } = this.props
     const rows = this.shapize(name)
 
