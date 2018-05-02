@@ -1,6 +1,5 @@
 const WebTorrent = require('webtorrent')
 const Rx = require('rxjs')
-const shapers = require('./shapers')
 
 const webtorrent = new WebTorrent()
 const events = ['infoHash', 'metadata', 'ready', 'warning', 'error', 'done', 'download', 'upload', 'wire', 'noPeers']
@@ -44,11 +43,11 @@ function stats() {
 }
 
 function all(original = false) {
-  return webtorrent.torrents.map(original ? v => v : shapers.torrent)
+  return webtorrent.torrents.map(original ? v => v : shape)
 }
 
 function get(hash, original = false) {
-  return webtorrent.torrents.filter(torrent => torrent.infoHash === hash).map(original ? v => v : shapers.torrent).pop()
+  return webtorrent.torrents.filter(torrent => torrent.infoHash === hash).map(original ? v => v : shape).pop()
 }
 
 function diff(torrent) {
