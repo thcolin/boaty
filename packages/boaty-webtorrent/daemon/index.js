@@ -6,30 +6,31 @@ const Rx = require('rxjs')
 const argv = require('minimist')(process.argv.slice(2))
 const loggers = require('./loggers')(argv)
 
-loggers.webtorrent.launch('Booting...')
-const client = require('./client')
-const store = require('./store.json')
+loggers.daemon.timing('Booting...')
+const config = require('../../../config.json')['@boaty/webtorrent']
+const daemon = new (require('./daemon'))(config)
+daemon.on('handling', (torrent) => loggers.daemon.spawn('Handling', torrent.name))
+daemon.on('error', (type, e) => loggers.daemon.error('Error', type, e))
+loggers.daemon.launch('Ready !')
 
-store.forEach(row => loggers.webtorrent.spawn('Loading', row.name))
-client.bootstrap(store)
-
-const server = new WebSocket.Server({ port: PORT })
+loggers.socket.timing('Booting...')
+const socket = new WebSocket.Server({ port: PORT })
 const transport = require('./transport')
 const actions = require('../actions')
-loggers.webtorrent.finish('Booted !')
+loggers.socket.launch('Ready !')
 
-server.on('connection', (socket) => {
+socket.on('connection', (client) => {
   loggers.socket.fetch('Connected !')
 
-  const dispatch = (feedback) => socket.readyState === WebSocket.OPEN && socket.send(transport.encode(feedback))
+  const dispatch = (feedback) => client.readyState === WebSocket.OPEN && client.send(transport.encode(feedback))
   const close$ = new Rx.Subject()
 
-  socket.on('close', () => {
+  client.on('close', () => {
     loggers.socket.terminate('Disconnected !')
     close$.next(true)
   })
 
-  socket.on('message', payload => {
+  client.on('message', payload => {
     const action = transport.decode(payload)
     loggers.socket.input(action.type, action)
 
@@ -39,7 +40,7 @@ server.on('connection', (socket) => {
 
         Rx.Observable
           .timer(0, 5000)
-          .map(() => client.stats())
+          .map(() => daemon.stats())
           .filter(stats => !Object.keys(stats).every(key => stats[key] === memory[key]))
           .do(stats => memory = stats)
           .takeUntil(close$)
@@ -52,14 +53,22 @@ server.on('connection', (socket) => {
       }
 
       case actions.FETCH_TORRENTS: {
-        const feedback = actions.fillTorrents(client.all())
+        const feedback = actions.fillTorrents(daemon.all(true, true))
         dispatch(feedback)
         loggers.socket.output(feedback.type)
         break
       }
 
       case actions.OBSERVE_TORRENTS: {
-        Rx.Observable.merge(...client.all(true).map(torrent => client.listen(torrent.infoHash, 1000)))
+        Rx.Observable.fromEvent(daemon, 'handling')
+          .takeUntil(close$)
+          .subscribe(torrent => {
+            const feedback = actions.enhanceTorrents(daemon.shape(torrent))
+            dispatch(feedback)
+            loggers.socket.output(feedback.type, torrent.name)
+          })
+
+        Rx.Observable.fromEvent(daemon, 'amend')
           .takeUntil(close$)
           .bufferTime(1000)
           .filter(group => group.length)

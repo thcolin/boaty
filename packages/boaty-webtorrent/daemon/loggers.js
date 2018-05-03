@@ -8,7 +8,7 @@ module.exports = (argv) => {
   logger.transform(fancy()).out(argv.quiet ? debugfile : process.stdout)
 
   return {
-    webtorrent: logger('webtorrent'),
-    socket: logger('websocket'),
+    daemon: logger('daemon'),
+    socket: logger('socket'),
   }
 }

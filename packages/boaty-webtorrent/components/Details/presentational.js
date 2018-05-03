@@ -77,7 +77,7 @@ export default class Details extends Component {
   }
 
   shouldComponentUpdate(props, state) {
-    if (props.item.hash !== (this.props.item || {}).hash) {
+    if (!props.item || !this.props.item || props.item.hash !== (this.props.item || {}).hash) {
       this.position.selected = 0
     }
 

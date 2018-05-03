@@ -18,6 +18,7 @@ actions.FETCH_TORRENTS = 'boaty/webtorrent/torrents/FETCH_TORRENTS'
 actions.OBSERVE_TORRENTS = 'boaty/webtorrent/torrents/torrent/OBSERVE_TORRENTS'
 actions.FILL_TORRENTS = 'boaty/webtorrent/torrents/FILL_TORRENTS'
 actions.ENHANCE_TORRENTS = 'boaty/webtorrent/torrents/ENHANCE_TORRENTS'
+actions.HARM_TORRENTS = 'boaty/webtorrent/torrents/HARM_TORRENTS'
 actions.AMEND_TORRENTS = 'boaty/webtorrent/torrents/AMEND_TORRENTS'
 actions.SIFT_TORRENTS = 'boaty/webtorrent/torrents/SIFT_TORRENTS'
 
@@ -41,6 +42,11 @@ actions.fillTorrents = (torrents) => {
 
 actions.enhanceTorrents = (torrent) => ({
   type: actions.ENHANCE_TORRENTS,
+  torrent
+})
+
+actions.harmTorrents = (torrent) => ({
+  type: actions.HARM_TORRENTS,
   torrent
 })
 

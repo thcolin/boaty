@@ -2,6 +2,6 @@ node_modules
 build
 playground.js
 debug.log
-*.torrent
-store.json
+**/*/daemon/store
 .DS_Store
+config.json

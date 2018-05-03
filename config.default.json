@@ -8,5 +8,10 @@
         }
       }
     ]
+  },
+  "@boaty/webtorrent": {
+    "download-dir": "/tmp/webtorrent/done",
+    "watch-dir": "/tmp/webtorrent/watch",
+    "watch-delete": true
   }
 }

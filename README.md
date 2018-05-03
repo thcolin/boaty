@@ -9,6 +9,7 @@ A peer-2-peer cli boat - or client, will work with webtorrent and dat
 How to run it ? - Hope to release it packaged to `brew` soon
 ```bash
 git clone https://github.com/thcolin/boaty.git && cd boaty
+cp config.default.json config.json
 npm run install
 npm run webtorrent:daemon #[-- --quiet]
 # in an other terminal
@@ -23,10 +24,10 @@ See below for available `panes`:
   * [x] Files
   * [x] Release
   * [x] Pieces (blocks like FlashGet ❤️)
+  * [ ] Actions (pause-resume/open/delete/erase)
   * [ ] Stream (?)
   * [ ] Speeds (cf. `vtop` diagram)
     * Use `sparkline` blessed-contrib type ?
-  * [ ] Actions (pause-resume/open/delete/erase)
   * [ ] Configuration (?)
 * [ ] Dat (`@boaty/dat`)
   * [ ] List
@@ -60,6 +61,11 @@ You can customize your configuration in `config.json` file:
       //   "children": "Hello World !"
       // }
     ]
+  },
+  "@boaty/webtorrent": {
+    "download-dir": "/tmp/webtorrent/done",
+    "watch-dir": "/tmp/webtorrent/watch",
+    "watch-delete": true
   }
 }
 ```
@@ -82,6 +88,23 @@ You can customize your configuration in `config.json` file:
 * Write `tests`
 * Improve `config.json`
   * `@boaty/webtorrent`
-    * see [Transmission](https://github.com/transmission/transmission/wiki/Editing-Configuration-Files)
+    * [x] `download-dir`
+    * [ ] `incomplete-dir`
+      * should listen for `torrent.on('done')` and edit all `torrent.files.*.path`
+    * [x] `watch-dir`
+    * [x] `watch-delete`
+    * [ ] `speed-limit-download`
+      * not available in `webtorrent` currently
+    * [ ] `speed-limit-upload`
+      * not available in `webtorrent` currently
+    * [ ] `queue-size-download`
+      * should implement queue system watching for every `torrent.on('done')`
+    * [ ] `queue-size-seed`
+      * should implement queue system watching for every `daemon.on('pause', torrent)`
+    * [ ] `blocklist-url`
+    * [ ] `chmod`
+      * should listen for `torrent.on('done')` and chmod `torrent.path`
+    * [ ] `ratio-limit`
+      * should listen for `torrent.on('upload')` until limit and then `torrent.pause()`
 * `@boaty/webtorrent`
   * Use `@boaty/boat/Spinner` component will other components are loading
