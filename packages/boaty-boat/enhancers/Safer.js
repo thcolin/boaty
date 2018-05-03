@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import logger from '@boaty/boat/utils/logger'
 
 export default class Safer extends Component {
   constructor(props) {
@@ -11,8 +12,7 @@ export default class Safer extends Component {
   }
 
   componentDidCatch(error, info) {
-    console.log(error)
-    console.log(info)
+    logger.error('Error', info, error)
 
     this.setState({
       error,

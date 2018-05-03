@@ -8,14 +8,13 @@ logger.out(stream)
 
 const loggers = {
   boaty: logger('boaty'),
-  console: logger('console')
 }
 
 // Don't overwrite the screen
-console.log = loggers.console.ignore
-console.warn = loggers.console.warn
-console.error = loggers.console.error
-console.info = loggers.console.ignore
-console.debug = loggers.console.issue
+console.log = () => {}
+console.warn = () => {}
+console.error = () => {}
+console.info = () => {}
+console.debug = () => {}
 
 export default loggers.boaty
