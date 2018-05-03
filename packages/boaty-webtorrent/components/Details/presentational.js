@@ -104,7 +104,7 @@ export default class Details extends Component {
       ['{bold}Size{/bold}', humanize.filesize(item.total)],
       ['{bold}Progress{/bold}', `${humanize.numberFormat(item.progress * 100)}% (${humanize.filesize(item.downloaded)} of ${humanize.filesize(item.total)})`],
       ['{bold}Uploaded{/bold}', humanize.filesize(item.uploaded)],
-      ['{bold}Remaining{/bold}', item.done ? 'Done' : item.paused ? 'Paused' : typeof item.timeRemaining === 'number' ? humanize.relativeTime((Date.now() + item.timeRemaining) / 1000).substring(3) : '∞'],
+      ['{bold}Remaining{/bold}', item.done ? 'Done' : item.stoped ? 'Paused' : typeof item.timeRemaining === 'number' ? humanize.relativeTime((Date.now() + item.timeRemaining) / 1000).substring(3) : '∞'],
       ['{bold}Speed{/bold}', `↓ ${humanize.speed(item.downloadSpeed)} - ↑ ${humanize.speed(item.uploadSpeed)}`],
       ['{bold}Ratio{/bold}', humanize.numberFormat(item.ratio).toString()],
       ['{bold}Peers{/bold}', item.peers.toString()],

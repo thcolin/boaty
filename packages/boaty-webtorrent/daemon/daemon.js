@@ -12,6 +12,7 @@ class Daemon extends EventEmitter {
     this.options = Object.assign({ duration: 1000 }, options)
     this.config = config
     this.events = ['infoHash', 'metadata', 'ready', 'warning', 'error', 'done', 'download', 'upload', 'wire', 'noPeers']
+    this.sideline = {}
     this.garbages = {}
     this.paths = {
       store: p.resolve(__dirname, 'store'),
@@ -55,15 +56,22 @@ class Daemon extends EventEmitter {
     }
   }
 
-  handle(uri) {
+  handle(uri, fresh = true) {
     const torrent = this.client.add(uri, { path: this.paths.download })
+
     torrent.on('ready', () => {
-      this.emit('handling', torrent)
+      torrent.uri = uri
+
+      if (fresh) {
+        this.emit('handling', torrent)
+      } else {
+        this.emit('amend', this.diff(torrent.infoHash))
+      }
 
       Rx.Observable
         .merge(...this.events.map(event => Rx.Observable.fromEvent(torrent, event)))
         .auditTime(this.options.duration)
-        .map(() => this.diff(torrent))
+        .map(() => this.diff(torrent.infoHash))
         .filter(differencies => differencies)
         .subscribe(differencies => this.emit('amend', differencies))
     })
@@ -80,11 +88,12 @@ class Daemon extends EventEmitter {
   shape(payload) {
     return {
       hash: payload.infoHash,
+      uri: payload.uri,
       name: payload.name,
       announce: payload.announce,
       path: payload.path,
       created: payload.created,
-      paused: payload.paused,
+      stoped: !!payload.stoped,
       done: payload.done,
       timeRemaining: payload.timeRemaining,
       total: payload.length,
@@ -101,17 +110,42 @@ class Daemon extends EventEmitter {
   }
 
   all(shape = false, ready = false) {
-    return this.client.torrents.filter(torrent => !ready || torrent.ready).map(shape ? this.shape : v => v)
+    return this.client.torrents
+      .filter(torrent => !ready || torrent.ready)
+      .map(shape ? this.shape : v => v)
+      .concat(shape ? Object.values(this.sideline) : [])
   }
 
   get(hash, shape = false, ready = false) {
-    return this.client.torrents.filter(torrent => (!ready || torrent.ready) && torrent.infoHash === hash).map(shape ? this.shape : v => v).pop()
+    return this.all(shape, ready)
+      .filter(torrent => torrent[shape ? 'hash' : 'infoHash'] === hash)
+      .pop()
   }
 
-  diff(torrent) {
-    const next = this.get(torrent.infoHash, true)
-    const previous = this.garbages[torrent.infoHash] || {}
-    const clone = { hash: torrent.infoHash }
+  pause(hash) {
+    const torrent = this.get(hash, true)
+
+    if (torrent) {
+      torrent.stoped = true
+      this.sideline[hash] = torrent
+      this.emit('amend', this.diff(hash))
+      this.client.remove(hash)
+    }
+  }
+
+  resume(hash) {
+    const torrent = this.get(hash, true)
+
+    if (torrent) {
+      delete this.sideline[hash]
+      this.handle(torrent.uri, false)
+    }
+  }
+
+  diff(hash) {
+    const next = this.get(hash, true)
+    const previous = this.garbages[hash] || {}
+    const clone = { hash: hash }
 
     for (let key in next) {
       if (['string', 'number', 'boolean'].includes(typeof next[key]) && next[key] !== previous[key]) {
@@ -121,7 +155,7 @@ class Daemon extends EventEmitter {
       }
     }
 
-    this.garbages[torrent.infoHash] = next
+    this.garbages[hash] = next
     return Object.keys(clone).length > 1 ? clone : null
   }
 }

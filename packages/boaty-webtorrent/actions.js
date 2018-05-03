@@ -62,26 +62,34 @@ actions.siftTorrents = (index) => ({
 
 // Torrent
 actions.AMEND_TORRENT = 'boaty/webtorrent/torrents/torrent/AMEND_TORRENT'
-actions.RESUME_TORRENT = 'boaty/webtorrent/torrents/torrent/RESUME_TORRENT'
 actions.PAUSE_TORRENT = 'boaty/webtorrent/torrents/torrent/PAUSE_TORRENT'
-actions.ASK_TORRENT = 'boaty/webtorrent/torrents/torrent/ASK_TORRENT'
+actions.RESUME_TORRENT = 'boaty/webtorrent/torrents/torrent/RESUME_TORRENT'
+actions.REMOVE_TORRENT = 'boaty/webtorrent/torrents/torrent/REMOVE_TORRENT'
+actions.DELETE_TORRENT = 'boaty/webtorrent/torrents/torrent/DELETE_TORRENT'
 
 actions.amendTorrent = (differencies) => ({
   type: actions.AMEND_TORRENT,
   differencies
 })
 
-actions.resumeTorrent = () => ({
-  type: actions.RESUME_TORRENT,
-})
-
-actions.pauseTorrent = () => ({
+actions.pauseTorrent = (hash) => ({
   type: actions.PAUSE_TORRENT,
+  hash
 })
 
-actions.askTorrent = (request) => ({
-  type: actions.ASK_TORRENT,
-  request
+actions.resumeTorrent = (hash) => ({
+  type: actions.RESUME_TORRENT,
+  hash
+})
+
+actions.removeTorrent = (hash) => ({
+  type: actions.REMOVE_TORRENT,
+  hash
+})
+
+actions.deleteTorrent = (hash) => ({
+  type: actions.DELETE_TORRENT,
+  hash
 })
 
 module.exports = actions

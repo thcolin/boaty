@@ -3,6 +3,7 @@ import Rx from 'rxjs'
 import websocket from '@boaty/webtorrent/store/websocket'
 import * as paneDuck from '@boaty/webtorrent/store/ducks/pane'
 import actions from '@boaty/webtorrent/actions'
+import logger from '@boaty/boat/utils/logger'
 
 // Reducer
 export const INITIAL = {
@@ -60,8 +61,9 @@ export function reducer (state = INITIAL, action = {}) {
 // Selectors
 export const partialTorrentsSelector = (state) => (
   state.torrents.result.map(hash => ({
+    hash,
     done: state.torrents.entities[hash].done,
-    paused: state.torrents.entities[hash].paused,
+    stoped: state.torrents.entities[hash].stoped,
     name: state.torrents.entities[hash].name,
     downloadSpeed: state.torrents.entities[hash].downloadSpeed,
     uploadSpeed: state.torrents.entities[hash].uploadSpeed,
@@ -80,6 +82,7 @@ export const siftedTorrentsSelector = (state) => (
 export const epic = combineEpics(
   fetchTorrentsEpic,
   observeTorrentsEpic,
+  applyTorrentEPic,
 )
 
 export function fetchTorrentsEpic(action$) {
@@ -91,5 +94,17 @@ export function fetchTorrentsEpic(action$) {
 export function observeTorrentsEpic(action$) {
   return action$.ofType(actions.FILL_TORRENTS)
     .do(() => websocket.dispatch(actions.observeTorrents()))
+    .mergeMap(() => Rx.Observable.never())
+}
+
+export function applyTorrentEPic(action$) {
+  return action$
+    .filter(action => [
+      actions.PAUSE_TORRENT,
+      actions.RESUME_TORRENT,
+      actions.REMOVE_TORRENT,
+      actions.DELETE_TORRENT,
+    ].includes(action.type))
+    .do(action => websocket.dispatch(action))
     .mergeMap(() => Rx.Observable.never())
 }

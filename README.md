@@ -78,6 +78,7 @@ You can customize your configuration in `config.json` file:
 * `Tab`: Switch between tiles (use `Shift` key for opposite direction)
 * `↓↑`: Move
 * `Enter`: Open (folders and files in `Files` tile, and path in `Torrents`)
+* `Space`: Pause / Resume (torrent in `Torrents`)
 * `Esc|q`: Quit
 
 # About
@@ -113,4 +114,7 @@ You can customize your configuration in `config.json` file:
     * [ ] `ratio-limit`
       * should listen for `torrent.on('upload')` until limit and then `torrent.pause()` (workable)
 * `@boaty/webtorrent`
+  * `Daemon` should save torrents state (stoped) and load it on boot
+  * Keep `Daemon:torrents` index order on `pause()` and `resume()`
   * Use `@boaty/boat/Spinner` component will other components are loading
+    * Discern loading from empty state

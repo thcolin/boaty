@@ -79,6 +79,16 @@ socket.on('connection', (client) => {
           })
         break
       }
+
+      case actions.PAUSE_TORRENT: {
+        daemon.pause(action.hash)
+        break
+      }
+
+      case actions.RESUME_TORRENT: {
+        daemon.resume(action.hash)
+        break
+      }
     }
   })
 })

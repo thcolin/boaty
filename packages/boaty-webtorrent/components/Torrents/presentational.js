@@ -52,8 +52,9 @@ export default class Torrents extends Component {
       focused: false
     }
 
-    this.handleOpen = this.handleOpen.bind(this)
     this.handleSelect = this.handleSelect.bind(this)
+    this.handleOpen = this.handleOpen.bind(this)
+    this.handleToggle = this.handleToggle.bind(this)
   }
 
   componentWillMount() {
@@ -64,12 +65,16 @@ export default class Torrents extends Component {
     // Events
     const keys$ = Rx.Observable.fromEvent(this.refs.self, 'element keypress', false, (el, ch, key) => ({ el, ch, key }))
     const open$ = keys$.filter(event => 'enter' === event.key.full)
+    const toggle$ = keys$.filter(event => 'space' === event.key.full)
     const move$ = keys$.filter(event => ['up', 'down'].includes(event.key.full))
     const blur$ = Rx.Observable.fromEvent(this.refs.self, 'element blur')
     const focus$ = Rx.Observable.fromEvent(this.refs.self, 'element focus')
 
     // Open
     open$.subscribe(this.handleOpen)
+
+    // Toggle
+    toggle$.subscribe(this.handleToggle)
 
     // Move
     Rx.Observable.merge(
@@ -86,13 +91,23 @@ export default class Torrents extends Component {
     this.refs.self.setScrollPerc(this.position.scroll)
   }
 
+  handleSelect(event) {
+    this.props.onSelect(event.el.selected - 1) // remove headers row
+    this.props.onUnfreeze()
+  }
+
   handleOpen(event) {
     opn(this.props.torrents[event.el.selected - 1].path)
   }
 
-  handleSelect(event) {
-    this.props.onSelect(event.el.selected - 1) // remove headers row
-    this.props.onUnfreeze()
+  handleToggle(event) {
+    const torrent = this.props.torrents[event.el.selected - 1]
+
+    if (torrent.stoped) {
+      this.props.onResume(torrent.hash)
+    } else {
+      this.props.onPause(torrent.hash)
+    }
   }
 
   shapize(torrents) {
@@ -106,13 +121,13 @@ export default class Torrents extends Component {
     }
 
     const rows = torrents.map(torrent => [
-      (torrent.done ? '✔' : torrent.paused ? '◼' : '▶'),
+      (torrent.stoped ? '◼' : torrent.done ? '✔' : '▶'),
       torrent.name,
-      (torrent.done || torrent.paused ? '-' : humanize.speed(torrent.downloadSpeed)),
-      humanize.speed(torrent.uploadSpeed),
+      (torrent.done || torrent.stoped ? '-' : humanize.speed(torrent.downloadSpeed)),
+      (torrent.stoped ? '-' : humanize.speed(torrent.uploadSpeed)),
       `${humanize.numberFormat(torrent.progress * 100, 0)}%`,
       humanize.filesize(torrent.total),
-      torrent.done ? '-' : torrent.paused ? '-' : typeof torrent.timeRemaining === 'number' ? humanize.relativeTime((Date.now() + torrent.timeRemaining) / 1000).substring(3) : '∞',
+      (torrent.done || torrent.stoped) ? '-' : typeof torrent.timeRemaining === 'number' ? humanize.relativeTime((Date.now() + torrent.timeRemaining) / 1000).substring(3) : '∞',
     ])
 
     const pad = rows.reduce((total, row) => {

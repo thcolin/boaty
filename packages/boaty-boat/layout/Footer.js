@@ -14,6 +14,7 @@ class Footer extends Component {
       'Tab': 'Switch',
       '↓↑': 'Move',
       'Enter': 'Open',
+      'Space': 'Pause / Resume',
       'q': 'Quit',
     }
 
