@@ -24,7 +24,11 @@ See below for available `panes`:
   * [x] Files
   * [x] Release
   * [x] Pieces (blocks like FlashGet ❤️)
-  * [ ] Actions (pause-resume/open/delete/erase)
+  * [ ] Actions
+    * [ ] Pause/Resume
+    * [x] Open
+    * [ ] Delete
+    * [ ] Erase
   * [ ] Stream (?)
   * [ ] Speeds (cf. `vtop` diagram)
     * Use `sparkline` blessed-contrib type ?
@@ -73,7 +77,7 @@ You can customize your configuration in `config.json` file:
 # Keys
 * `Tab`: Switch between tiles (use `Shift` key for opposite direction)
 * `↓↑`: Move
-* `Enter`: Open (folders and files in `Files` tile)
+* `Enter`: Open (folders and files in `Files` tile, and path in `Torrents`)
 * `Esc|q`: Quit
 
 # About
@@ -89,22 +93,24 @@ You can customize your configuration in `config.json` file:
 * Improve `config.json`
   * `@boaty/webtorrent`
     * [x] `download-dir`
+    * [ ] `download-subfolder`
+      * should have `torrent.name` on `webtorrent.add(uri, { path })` (complicated)
     * [ ] `incomplete-dir`
-      * should listen for `torrent.on('done')` and edit all `torrent.files.*.path`
+      * should listen for `torrent.on('done')` and edit all `torrent.files.*.path` (complicated)
     * [x] `watch-dir`
     * [x] `watch-delete`
     * [ ] `speed-limit-download`
-      * not available in `webtorrent` currently
+      * not available in `webtorrent` currently (complicated)
     * [ ] `speed-limit-upload`
-      * not available in `webtorrent` currently
+      * not available in `webtorrent` currently (complicated)
     * [ ] `queue-size-download`
-      * should implement queue system watching for every `torrent.on('done')`
+      * should implement queue system watching for every `torrent.on('done')` (workable)
     * [ ] `queue-size-seed`
-      * should implement queue system watching for every `daemon.on('pause', torrent)`
+      * should implement queue system watching for every `daemon.on('pause', torrent)` (workable)
     * [ ] `blocklist-url`
     * [ ] `chmod`
-      * should listen for `torrent.on('done')` and chmod `torrent.path`
+      * should listen for `torrent.on('done')` and chmod `torrent.path` (workable)
     * [ ] `ratio-limit`
-      * should listen for `torrent.on('upload')` until limit and then `torrent.pause()`
+      * should listen for `torrent.on('upload')` until limit and then `torrent.pause()` (workable)
 * `@boaty/webtorrent`
   * Use `@boaty/boat/Spinner` component will other components are loading

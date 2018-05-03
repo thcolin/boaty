@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import Rx from 'rxjs'
 import humanize from 'humanize'
+import opn from 'opn'
 import router from '@boaty/boat/services/router'
 import logger from '@boaty/boat/utils/logger'
 
@@ -51,6 +52,7 @@ export default class Torrents extends Component {
       focused: false
     }
 
+    this.handleOpen = this.handleOpen.bind(this)
     this.handleSelect = this.handleSelect.bind(this)
   }
 
@@ -60,35 +62,32 @@ export default class Torrents extends Component {
 
   componentDidMount() {
     // Events
-    const move$ = Rx.Observable
-      .fromEvent(this.refs.self, 'element keypress', false, (el, ch, key) => ({ el, ch, key }))
-      .filter(event => ['up', 'down'].includes(event.key.full))
+    const keys$ = Rx.Observable.fromEvent(this.refs.self, 'element keypress', false, (el, ch, key) => ({ el, ch, key }))
+    const open$ = keys$.filter(event => 'enter' === event.key.full)
+    const move$ = keys$.filter(event => ['up', 'down'].includes(event.key.full))
+    const blur$ = Rx.Observable.fromEvent(this.refs.self, 'element blur')
+    const focus$ = Rx.Observable.fromEvent(this.refs.self, 'element focus')
 
-    const blur$ = Rx.Observable
-      .fromEvent(this.refs.self, 'element blur')
-
-    const focus$ = Rx.Observable
-      .fromEvent(this.refs.self, 'element focus')
+    // Open
+    open$.subscribe(this.handleOpen)
 
     // Move
     Rx.Observable.merge(
-      move$
-        .do(() => this.props.onFreeze())
-        .do(event => this.position.scroll = event.el.getScrollPerc())
-        .debounceTime(500),
-      move$
-        .sample(blur$)
-    )
-    .subscribe(this.handleSelect)
+      move$.do(() => this.props.onFreeze()).do(event => this.position.scroll = event.el.getScrollPerc()).debounceTime(500),
+      move$.sample(blur$)
+    ).subscribe(this.handleSelect)
 
     // Focus
-    Rx.Observable.merge(focus$.mapTo(true), blur$.mapTo(false))
-      .subscribe(focused => this.setState({ focused }))
+    Rx.Observable.merge(focus$.mapTo(true), blur$.mapTo(false)).subscribe(focused => this.setState({ focused }))
   }
 
   componentDidUpdate() {
     this.refs.self.select(this.props.selected + 1) // add headers row
     this.refs.self.setScrollPerc(this.position.scroll)
+  }
+
+  handleOpen(event) {
+    opn(this.props.torrents[event.el.selected - 1].path)
   }
 
   handleSelect(event) {

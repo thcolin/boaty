@@ -67,6 +67,7 @@ export const partialTorrentsSelector = (state) => (
     uploadSpeed: state.torrents.entities[hash].uploadSpeed,
     progress: state.torrents.entities[hash].progress,
     total: state.torrents.entities[hash].total,
+    path: state.torrents.entities[hash].path,
     timeRemaining: state.torrents.entities[hash].timeRemaining,
   }))
 )

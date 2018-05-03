@@ -64,7 +64,7 @@ actions.siftTorrents = (index) => ({
 actions.AMEND_TORRENT = 'boaty/webtorrent/torrents/torrent/AMEND_TORRENT'
 actions.RESUME_TORRENT = 'boaty/webtorrent/torrents/torrent/RESUME_TORRENT'
 actions.PAUSE_TORRENT = 'boaty/webtorrent/torrents/torrent/PAUSE_TORRENT'
-actions.REMOVE_TORRENT = 'boaty/webtorrent/torrents/torrent/REMOVE_TORRENT'
+actions.ASK_TORRENT = 'boaty/webtorrent/torrents/torrent/ASK_TORRENT'
 
 actions.amendTorrent = (differencies) => ({
   type: actions.AMEND_TORRENT,
@@ -79,8 +79,9 @@ actions.pauseTorrent = () => ({
   type: actions.PAUSE_TORRENT,
 })
 
-actions.removeTorrent = () => ({
-  type: actions.REMOVE_TORRENT,
+actions.askTorrent = (request) => ({
+  type: actions.ASK_TORRENT,
+  request
 })
 
 module.exports = actions

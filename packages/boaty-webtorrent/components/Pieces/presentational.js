@@ -39,9 +39,7 @@ export default class Pieces extends Component {
     const focus$ = Rx.Observable.fromEvent(this.refs.self, 'element focus')
 
     // Focus
-    Rx.Observable
-      .merge(focus$.mapTo(true), blur$.mapTo(false))
-      .subscribe(focused => this.setState({ focused }))
+    Rx.Observable.merge(focus$.mapTo(true), blur$.mapTo(false)).subscribe(focused => this.setState({ focused }))
   }
 
   componentWillUnmount() {

@@ -48,15 +48,11 @@ export default class Release extends Component {
 
   componentDidMount() {
     // Events
-    const blur$ = Rx.Observable
-      .fromEvent(this.refs.self, 'element blur')
-
-    const focus$ = Rx.Observable
-      .fromEvent(this.refs.self, 'element focus')
+    const blur$ = Rx.Observable.fromEvent(this.refs.self, 'element blur')
+    const focus$ = Rx.Observable.fromEvent(this.refs.self, 'element focus')
 
     // Focus
-    Rx.Observable.merge(focus$.mapTo(true), blur$.mapTo(false))
-      .subscribe(focused => this.setState({ focused }))
+    Rx.Observable.merge(focus$.mapTo(true), blur$.mapTo(false)).subscribe(focused => this.setState({ focused }))
   }
 
   componentWillMount() {

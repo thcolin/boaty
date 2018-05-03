@@ -58,25 +58,17 @@ export default class Files extends Component {
 
   componentDidMount() {
     // Events
-    const move$ = Rx.Observable
-      .fromEvent(this.refs.self, 'element keypress', false, (el, ch, key) => ({ el, ch, key }))
-      .filter(event => ['up', 'down'].includes(event.key.full))
-
-    const blur$ = Rx.Observable
-      .fromEvent(this.refs.self, 'element blur')
-
-    const focus$ = Rx.Observable
-      .fromEvent(this.refs.self, 'element focus')
-
-    const select$ = Rx.Observable
-      .fromEvent(this.refs.self, 'select')
+    const keys$ = Rx.Observable.fromEvent(this.refs.self, 'element keypress', false, (el, ch, key) => ({ el, ch, key }))
+    const move$ = keys$.filter(event => ['up', 'down'].includes(event.key.full))
+    const blur$ = Rx.Observable.fromEvent(this.refs.self, 'element blur')
+    const focus$ = Rx.Observable.fromEvent(this.refs.self, 'element focus')
+    const select$ = Rx.Observable.fromEvent(this.refs.self, 'select')
 
     // Move
     move$.subscribe(this.handleMove)
 
     // Focus
-    Rx.Observable.merge(focus$.mapTo(true), blur$.mapTo(false))
-      .subscribe(focused => this.setState({ focused }))
+    Rx.Observable.merge(focus$.mapTo(true), blur$.mapTo(false)).subscribe(focused => this.setState({ focused }))
 
     // Select
     select$.subscribe(this.handleSelect)
