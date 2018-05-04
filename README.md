@@ -24,11 +24,11 @@ See below for available `panes`:
   * [x] Files
   * [x] Release
   * [x] Pieces (blocks like FlashGet ❤️)
-  * [ ] Actions
-    * [ ] Pause/Resume
+  * [x] Actions
+    * [x] Pause/Resume
     * [x] Open
-    * [ ] Delete
-    * [ ] Erase
+    * [x] Delete
+    * [x] Erase
   * [ ] Stream (?)
   * [ ] Speeds (cf. `vtop` diagram)
     * Use `sparkline` blessed-contrib type ?
@@ -115,6 +115,7 @@ You can customize your configuration in `config.json` file:
       * should listen for `torrent.on('upload')` until limit and then `torrent.pause()` (workable)
 * `@boaty/webtorrent`
   * `Daemon` should save torrents state (stoped) and load it on boot
+  * Should send `FILL_TORRENTS` every 10s to be force update
   * Keep `Daemon:torrents` index order on `pause()` and `resume()`
   * Use `@boaty/boat/Spinner` component will other components are loading
     * Discern loading from empty state

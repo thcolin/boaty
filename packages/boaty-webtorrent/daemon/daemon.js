@@ -16,6 +16,7 @@ class Daemon extends EventEmitter {
     this.garbages = {}
     this.paths = {
       store: p.resolve(__dirname, 'store'),
+      trash: p.resolve(__dirname, 'trash'),
       watch: this.config['watch-dir'],
       download: this.config['download-dir']
     }
@@ -139,6 +140,31 @@ class Daemon extends EventEmitter {
     if (torrent) {
       delete this.sideline[hash]
       this.handle(torrent.uri, false)
+    }
+  }
+
+  remove(hash) {
+    const torrent = this.get(hash, true)
+
+    if (torrent) {
+      fs.copyFile(torrent.uri, p.resolve(this.paths.trash, p.basename(torrent.uri)), () => {
+        this.client.remove(hash)
+        this.emit('truncate', hash)
+        rimraf(torrent.uri, { glob: false }, (e) => e && this.emit('error', 'WebTorrent/boaty/drain/delete', e))
+      })
+    }
+  }
+
+  delete(hash) {
+    const torrent = this.get(hash, true)
+
+    if (torrent) {
+      fs.copyFile(torrent.uri, p.resolve(this.paths.trash, p.basename(torrent.uri)), () => {
+        this.client.remove(hash)
+        this.emit('truncate', hash)
+        rimraf(torrent.uri, { glob: false }, (e) => e && this.emit('error', 'WebTorrent/boaty/drain/delete', e))
+        rimraf(p.resolve(torrent.path, torrent.files.shift().split(p.sep).shift()), { glob: false }, (e) => e && this.emit('error', 'WebTorrent/boaty/drain/delete', e))
+      })
     }
   }
 

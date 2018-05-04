@@ -20,6 +20,11 @@ export function reducer (state = INITIAL, action = {}) {
         entities: action.entities,
         result: action.result,
       }
+    case actions.SIFT_TORRENTS:
+      return {
+        ...state,
+        selected: action.index,
+      }
     case actions.ENHANCE_TORRENTS:
       return {
         ...state,
@@ -40,10 +45,13 @@ export function reducer (state = INITIAL, action = {}) {
             }), {})
         }
       }
-    case actions.SIFT_TORRENTS:
+    case actions.TRUNCATE_TORRENTS:
       return {
         ...state,
-        selected: action.index,
+        entities: Object.values(state.entities)
+          .filter(torrent => torrent.hash !== action.hash)
+          .reduce((entities, torrent) => Object.assign(entities, { [torrent.hash]: torrent }), {}),
+        result: state.result.filter(hash => hash !== action.hash)
       }
     case actions.AMEND_TORRENT:
       return {

@@ -55,6 +55,8 @@ export default class Torrents extends Component {
     this.handleSelect = this.handleSelect.bind(this)
     this.handleOpen = this.handleOpen.bind(this)
     this.handleToggle = this.handleToggle.bind(this)
+    this.handleRemove = this.handleRemove.bind(this)
+    this.handleDelete = this.handleDelete.bind(this)
   }
 
   componentWillMount() {
@@ -66,6 +68,8 @@ export default class Torrents extends Component {
     const keys$ = Rx.Observable.fromEvent(this.refs.self, 'element keypress', false, (el, ch, key) => ({ el, ch, key }))
     const open$ = keys$.filter(event => 'enter' === event.key.full)
     const toggle$ = keys$.filter(event => 'space' === event.key.full)
+    const remove$ = keys$.filter(event => 'backspace' === event.key.full)
+    const delete$ = keys$.filter(event => 'delete' === event.key.full)
     const move$ = keys$.filter(event => ['up', 'down'].includes(event.key.full))
     const blur$ = Rx.Observable.fromEvent(this.refs.self, 'element blur')
     const focus$ = Rx.Observable.fromEvent(this.refs.self, 'element focus')
@@ -75,6 +79,12 @@ export default class Torrents extends Component {
 
     // Toggle
     toggle$.subscribe(this.handleToggle)
+
+    // Remove
+    remove$.subscribe(this.handleRemove)
+
+    // Delete
+    delete$.subscribe(this.handleDelete)
 
     // Move
     Rx.Observable.merge(
@@ -108,6 +118,14 @@ export default class Torrents extends Component {
     } else {
       this.props.onPause(torrent.hash)
     }
+  }
+
+  handleRemove(event) {
+    this.props.onRemove(this.props.torrents[event.el.selected - 1].hash)
+  }
+
+  handleDelete(event) {
+    this.props.onDelete(this.props.torrents[event.el.selected - 1].hash)
   }
 
   shapize(torrents) {

@@ -68,6 +68,14 @@ socket.on('connection', (client) => {
             loggers.socket.output(feedback.type, torrent.name)
           })
 
+        Rx.Observable.fromEvent(daemon, 'truncate')
+          .takeUntil(close$)
+          .subscribe(hash => {
+            const feedback = actions.truncateTorrents(hash)
+            dispatch(feedback)
+            loggers.socket.output(feedback.type, hash)
+          })
+
         Rx.Observable.fromEvent(daemon, 'amend')
           .takeUntil(close$)
           .bufferTime(1000)
@@ -87,6 +95,16 @@ socket.on('connection', (client) => {
 
       case actions.RESUME_TORRENT: {
         daemon.resume(action.hash)
+        break
+      }
+
+      case actions.REMOVE_TORRENT: {
+        daemon.remove(action.hash)
+        break
+      }
+
+      case actions.DELETE_TORRENT: {
+        daemon.delete(action.hash)
         break
       }
     }

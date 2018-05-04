@@ -3,5 +3,6 @@ build
 playground.js
 debug.log
 **/*/daemon/store
+**/*/daemon/trash
 .DS_Store
 config.json
