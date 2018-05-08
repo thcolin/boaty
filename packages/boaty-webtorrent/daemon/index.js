@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-const PORT = 9876
 const WebSocket = require('ws')
 const Rx = require('rxjs')
 
 const argv = require('minimist')(process.argv.slice(2))
+const PORT = argv.port || 9876
 const loggers = require('./loggers')(argv)
 
 loggers.daemon.timing('Booting...')

@@ -24,13 +24,13 @@ class Daemon extends EventEmitter {
     this.client = new WebTorrent()
     this.client.on('error', e => this.emit('error', 'WebTorrent/boaty', e))
 
-    fs.readdir(this.paths.store, (e, files) => files
+    fs.readdir(this.paths.store, (e, files) => (files || [])
       .filter(filename => p.extname(filename) === '.torrent')
       .map(filename => p.resolve(this.paths.store, filename))
       .forEach(path => this.handle(path))
     )
 
-    fs.readdir(this.paths.watch, (e, files) => files
+    fs.readdir(this.paths.watch, (e, files) => (files || [])
       .filter(filename => p.extname(filename) === '.torrent')
       .map(filename => p.resolve(this.paths.watch, filename))
       .forEach(path => this.drain(path))

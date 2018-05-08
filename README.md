@@ -11,9 +11,10 @@ How to run it ? - Hope to release it packaged to `brew` soon
 git clone https://github.com/thcolin/boaty.git && cd boaty
 cp config.default.json config.json
 npm run install
-npm run webtorrent:daemon #[-- --quiet]
+npm run webtorrent:daemon #[-- --quiet --port=9876]
 # in an other terminal
-npm run build && npm run start
+npm run build
+npm run start #[-- --host=localhost --port=9876]
 ```
 
 ## Panes
@@ -29,7 +30,11 @@ See below for available `panes`:
     * [x] Open
     * [x] Delete
     * [x] Erase
-  * [ ] Stream (?)
+  * [ ] Stream / Cast (see [webtorrent/webtorrent-cli](https://github.com/webtorrent/webtorrent-cli/blob/master/bin/cmd.js#L429)
+    * AirPlay
+    * Chromecast
+    * Kodi (XBMC)
+    * VLC
   * [ ] Speeds (cf. `vtop` diagram)
     * Use `sparkline` blessed-contrib type ?
   * [ ] Configuration (?)
@@ -114,8 +119,8 @@ You can customize your configuration in `config.json` file:
     * [ ] `ratio-limit`
       * should listen for `torrent.on('upload')` until limit and then `torrent.pause()` (workable)
 * `@boaty/webtorrent`
-  * `Daemon` should save torrents state (stoped) and load it on boot
-  * Should send `FILL_TORRENTS` every 10s to be force update
-  * Keep `Daemon:torrents` index order on `pause()` and `resume()`
   * Use `@boaty/boat/Spinner` component will other components are loading
     * Discern loading from empty state
+  * `Daemon` should save torrents state (stoped) and load it on boot
+  * Should send `FILL_TORRENTS` every 10s to force update
+  * Keep `Daemon:torrents` index order on `pause()` and `resume()`

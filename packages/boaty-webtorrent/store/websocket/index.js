@@ -4,8 +4,10 @@ import Rx from 'rxjs'
 import * as paneDuck from '@boaty/webtorrent/store/ducks/pane'
 import logger from '@boaty/boat/utils/logger'
 
-const PORT = 9876
-const URI = `ws://localhost:${PORT}`
+const argv = require('minimist')(process.argv.slice(2))
+const HOST = argv.host || 'localhost'
+const PORT = argv.port || 9876
+const URI = `ws://${HOST}:${PORT}`
 const subject$ = new Rx.Subject()
 const client = new Client()
 const websocket = {
