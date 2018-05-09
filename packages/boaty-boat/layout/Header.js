@@ -10,7 +10,20 @@ const mapStateToProps = (state) => ({
 })
 
 class Header extends Component {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      now: new Date()
+    }
+
+    setInterval(() => this.setState({
+      now: new Date()
+    }), 1000)
+  }
+
   render() {
+    const { now } = this.state
     const { stats } = this.props
     const values = {
       '↓': humanize.speed(stats.down),
@@ -34,7 +47,11 @@ class Header extends Component {
         <text
           tags={true}
           right={0}
-          content={`{bold}${stats.connections.map(connection => `${connection.host}:${connection.port}`).join(' - ')}{/bold}`}
+          content={[
+            now.getHours(),
+            now.getMinutes(),
+            now.getSeconds(),
+          ].map(value => value.toString().padStart(2, '0')).join(':')}
         />
       </box>
     )

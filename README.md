@@ -84,6 +84,8 @@ You can customize your configuration in `config.json` file:
 * `↓↑`: Move
 * `Enter`: Open (folders and files in `Files` tile, and path in `Torrents`)
 * `Space`: Pause / Resume (torrent in `Torrents`)
+* `Backspace`: Remove (torrent in `Torrents`)
+* `Delete`: Delete (torrent in `Torrents`)
 * `Esc|q`: Quit
 
 # About
