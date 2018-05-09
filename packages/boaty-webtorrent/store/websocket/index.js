@@ -1,7 +1,7 @@
 import WebSocket from 'ws'
 import Client from '@boaty/webtorrent/store/websocket/client'
 import Rx from 'rxjs'
-import * as paneDuck from '@boaty/webtorrent/store/ducks/pane'
+import * as websocketDuck from '@boaty/webtorrent/store/ducks/websocket'
 import logger from '@boaty/boat/utils/logger'
 
 const argv = require('minimist')(process.argv.slice(2))
@@ -27,12 +27,12 @@ client.on('message', (payload) => subject$.next(decode(payload)))
 
 client.on('open', () => {
   logger.fetch('WebTorrent')
-  subject$.next(paneDuck.successSocket())
+  subject$.next(websocketDuck.successWebsocket())
 })
 
 client.on('close', () => {
   logger.terminate('WebTorrent')
-  subject$.next(paneDuck.failureSocket())
+  subject$.next(websocketDuck.failureWebsocket())
 })
 
 async function wait(client) {

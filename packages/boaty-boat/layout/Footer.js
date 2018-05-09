@@ -1,15 +1,15 @@
 import React, { Component } from 'react'
 import context from '@boaty/boat/services/context'
 import { connect } from 'react-redux'
-import { onlineSelector } from '@boaty/boat/store/ducks/app'
+import { readySelector } from '@boaty/boat/store/ducks/app'
 
 const mapStateToProps = (state) => ({
-  online: onlineSelector(state),
+  ready: readySelector(state),
 })
 
 class Footer extends Component {
   render() {
-    const { online } = this.props
+    const { ready } = this.props
     const commands = {
       'Tab': 'Switch',
       '↓↑': 'Move',
@@ -32,7 +32,7 @@ class Footer extends Component {
         <text
           tags={true}
           right={0}
-          content={`${context.homepage} - ${online ? '⛅ ' : '⛈️ '}`}
+          content={`${context.homepage} - ${ready ? '⛅ ' : '⛈️ '}`}
         />
       </box>
     )

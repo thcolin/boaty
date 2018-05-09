@@ -1,7 +1,7 @@
 import { combineEpics } from 'redux-observable'
 import Rx from 'rxjs'
 import websocket from '@boaty/webtorrent/store/websocket'
-import * as paneDuck from '@boaty/webtorrent/store/ducks/pane'
+import * as websocketDuck from '@boaty/webtorrent/store/ducks/websocket'
 import actions from '@boaty/webtorrent/actions'
 import logger from '@boaty/boat/utils/logger'
 
@@ -94,7 +94,7 @@ export const epic = combineEpics(
 )
 
 export function fetchTorrentsEpic(action$) {
-  return action$.ofType(paneDuck.SUCCESS_SOCKET)
+  return action$.ofType(websocketDuck.SUCCESS_WEBSOCKET)
     .do(() => websocket.dispatch(actions.fetchTorrents()))
     .mergeMap(() => Rx.Observable.never())
 }

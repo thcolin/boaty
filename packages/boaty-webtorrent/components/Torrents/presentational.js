@@ -103,7 +103,7 @@ export default class Torrents extends Component {
 
   handleSelect(event) {
     this.props.onSelect(event.el.selected - 1) // remove headers row
-    this.props.onUnfreeze()
+    this.props.onRelease()
   }
 
   handleOpen(event) {

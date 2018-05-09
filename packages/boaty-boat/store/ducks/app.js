@@ -53,9 +53,9 @@ export const amendPane = (name, payload) => ({
 })
 
 // Selectors
-export const onlineSelector = (state) => Object.keys(state.app.panes)
+export const readySelector = (state) => Object.keys(state.app.panes)
   .map(name => state.app.panes[name])
-  .reduce((online, pane) => online * pane.online, 1)
+  .reduce((ready, pane) => ready * pane.ready, 1)
 
 export const statsSelector = (state) => Object.keys(state.app.panes)
   .map(name => state.app.panes[name])
