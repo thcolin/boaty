@@ -119,8 +119,7 @@ You can customize your configuration in `config.json` file:
     * [ ] `ratio-limit`
       * should listen for `torrent.on('upload')` until limit and then `torrent.pause()` (workable)
 * `@boaty/webtorrent`
-  * Use `@boaty/boat/Spinner` component will other components are loading
-    * Discern loading from empty state
+  * `Files` should be able to open distant (`host !== 'localhost'`) files
   * `Daemon` should save torrents state (stoped) and load it on boot
   * Should send `FILL_TORRENTS` every 10s to force update
   * Keep `Daemon:torrents` index order on `pause()` and `resume()`

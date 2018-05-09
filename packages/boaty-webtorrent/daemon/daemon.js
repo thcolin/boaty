@@ -83,6 +83,8 @@ class Daemon extends EventEmitter {
       down: this.client.downloadSpeed,
       up: this.client.uploadSpeed,
       ratio: this.client.ratio,
+      total: this.all(true).length,
+      done: this.all(true).filter(torrent => torrent.done).length
     }
   }
 

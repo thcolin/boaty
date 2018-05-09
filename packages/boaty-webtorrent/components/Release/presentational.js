@@ -63,9 +63,7 @@ export default class Release extends Component {
     const width = Math.max(0, ((this.refs.self || {}).width || 0) - 4)
 
     if (!name) {
-      return [
-        ['Loading...']
-      ]
+      return [['']]
     }
 
     const release = oleoo.parse(name)

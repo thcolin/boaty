@@ -93,9 +93,7 @@ export default class Details extends Component {
     const pad = 14
 
     if (!item) {
-      return [
-        ['Loading...']
-      ]
+      return [['']]
     }
 
     const rows = ([

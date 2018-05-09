@@ -14,6 +14,9 @@ export const INITIAL = {
 
 export function reducer (state = INITIAL, action = {}) {
   switch (action.type) {
+    case websocketDuck.SUCCESS_WEBSOCKET:
+    case websocketDuck.FAILURE_WEBSOCKET:
+      return INITIAL
     case actions.FILL_TORRENTS:
       return {
         selected: 0,

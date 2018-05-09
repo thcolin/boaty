@@ -24,9 +24,17 @@ export default class Spinner extends Component {
 
   render() {
     const { frames, beat } = this.state
+    const { text, ellipsis } = this.props
 
     return (
-      <box>{frames[beat % frames.length]}</box>
+      <box>
+        <box>{frames[beat % frames.length]}</box>
+        {text && (
+          <box left={2}>
+            {ellipsis ? <box><box>{text}</box><box left={text.length}><Spinner name="simpleDots" /></box></box> : text}
+          </box>
+        )}
+      </box>
     )
   }
 }

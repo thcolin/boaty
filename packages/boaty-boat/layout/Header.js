@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { statsSelector } from '@boaty/boat/store/ducks/app'
 import humanize from 'humanize'
 import context from '@boaty/boat/services/context'
+import logger from '@boaty/boat/utils/logger'
 
 const mapStateToProps = (state) => ({
   stats: statsSelector(state),
@@ -23,6 +24,12 @@ class Header extends Component {
 
   render() {
     const { stats } = this.props
+    const values = {
+      '↓': humanize.speed(stats.down),
+      '↑': humanize.speed(stats.up),
+      '~': humanize.numberFormat(stats.ratio, 2),
+      '≡': `${stats.done}/${stats.total}`
+    }
 
     return (
       <box>
@@ -34,7 +41,7 @@ class Header extends Component {
         <text
           tags={true}
           left="center"
-          content={`{bold}↓ ${humanize.speed(stats.down)} ↑ ${humanize.speed(stats.up)} ~ ${humanize.numberFormat(stats.ratio, 2)}{/bold}`}
+          content={`{bold}${Object.keys(values).map(key => `${key} ${values[key]}`).join(' ')}{/bold}`}
         />
         <text
           tags={true}

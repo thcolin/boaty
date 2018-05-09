@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import Spinner from '@boaty/boat/components/Spinner'
 import Rx from 'rxjs'
 import humanize from 'humanize'
 import opn from 'opn'
@@ -130,12 +131,10 @@ export default class Torrents extends Component {
 
   shapize(torrents) {
     const width = Math.max(0, ((this.refs.self || {}).width || 0) - 2)
+    const headers = ['?', 'Name', '↓', '↑', '%', '#', '@']
 
     if (!torrents.length) {
-      return [
-        ['Loading'],
-        ['Loading...']
-      ]
+      return [headers].concat([['', '', '', '', '', '', '']])
     }
 
     const rows = torrents.map(torrent => [
@@ -153,7 +152,7 @@ export default class Torrents extends Component {
       return total > current ? total : current
     }, 0)
 
-    return [['?', 'Name', '↓', '↑', '%', '#', '@']].concat(rows.map(row => {
+    return [headers].concat(rows.map(row => {
       const name = row[1]
       const ellipsed = (name.length > (width - pad) ? `${name.substring(0, (width - pad)).trim()}...` : name)
       row[1] = ellipsed.padEnd(width - pad, ' ')
@@ -163,7 +162,7 @@ export default class Torrents extends Component {
 
   render() {
     logger.ignore('Render', Torrents.uri, [this.props.selected])
-    const { torrents } = this.props
+    const { torrents, loading } = this.props
     const rows = this.shapize(torrents)
 
     return (
@@ -176,6 +175,11 @@ export default class Torrents extends Component {
           rows={rows}
           {...style(this.state).table}
         />
+        {loading && (
+          <box top="50%" left="50%-6">
+            <Spinner text="Loading" ellipsis={true} />
+          </box>
+        )}
       </box>
     )
   }

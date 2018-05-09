@@ -60,7 +60,9 @@ export const readySelector = (state) => Object.keys(state.app.panes)
 export const statsSelector = (state) => Object.keys(state.app.panes)
   .map(name => state.app.panes[name])
   .reduce((stats, pane) => ({
-    down: (stats.down || 0) + pane.down,
-    up: (stats.up || 0) + pane.up,
-    ratio: (stats.ratio || 0) + pane.ratio,
+    down: (stats.down || 0) + (pane.down || 0),
+    up: (stats.up || 0) + (pane.up || 0),
+    ratio: (stats.ratio || 0) + (pane.ratio || 0),
+    total: (stats.total || 0) + (pane.total || 0),
+    done: (stats.done || 0) + (pane.done || 0),
   }), {})

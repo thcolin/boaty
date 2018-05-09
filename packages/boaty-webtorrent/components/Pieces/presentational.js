@@ -46,9 +46,16 @@ export default class Pieces extends Component {
     router.rescind(Pieces.uri)
   }
 
+  shapize(pieces) {
+    return pieces
+      .map(value => value === 1 ? '{blue-fg}◼{/blue-fg}' : value === 0 ? '{bright-fg}◼{/bright-fg}' : '{grey-fg}◼{/grey-fg}') // ◻
+      .join('')
+  }
+
   render() {
     logger.ignore('Render', Pieces.uri, [this.props.pieces.length])
     const { pieces } = this.props
+    const content = this.shapize(pieces)
 
     return (
       <box
@@ -57,10 +64,7 @@ export default class Pieces extends Component {
         keys={true}
         scrollable={true}
         tags={true}
-        content={pieces
-          .map(value => value === 1 ? '{blue-fg}◼{/blue-fg}' : value === 0 ? '{bright-fg}◼{/bright-fg}' : '{grey-fg}◼{/grey-fg}')
-          .join('')
-        } // ◻
+        content={content}
         {...style(this.state, this.props)}
       />
     )
