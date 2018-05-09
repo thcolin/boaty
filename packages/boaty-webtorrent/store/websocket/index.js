@@ -2,12 +2,10 @@ import WebSocket from 'ws'
 import Client from '@boaty/webtorrent/store/websocket/client'
 import Rx from 'rxjs'
 import * as websocketDuck from '@boaty/webtorrent/store/ducks/websocket'
+import connection from '@boaty/webtorrent/utils/connection'
 import logger from '@boaty/boat/utils/logger'
 
-const argv = require('minimist')(process.argv.slice(2))
-const HOST = argv.host || 'localhost'
-const PORT = argv.port || 9876
-const URI = `ws://${HOST}:${PORT}`
+const URI = `ws://${connection.host}:${connection.port}`
 const subject$ = new Rx.Subject()
 const client = new Client()
 const websocket = {

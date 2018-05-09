@@ -5,6 +5,7 @@ import websocket from '@boaty/webtorrent/store/websocket'
 import boatStore from '@boaty/boat/store'
 import * as appDuck from '@boaty/boat/store/ducks/app'
 import * as paneDuck from '@boaty/webtorrent/store/ducks/pane'
+import connection from '@boaty/webtorrent/utils/connection'
 import actions from '@boaty/webtorrent/actions'
 
 // Actions
@@ -60,7 +61,7 @@ export const epic = combineEpics(
 export function subscribeWebsocketEpic(action$, store) {
   return action$.ofType(paneDuck.INIT)
     .do(() => boatStore.dispatch(
-      appDuck.registerPane('webtorrent', { ready: store.getState().websocket.online })
+      appDuck.registerPane('webtorrent', Object.assign({ ready: store.getState().websocket.online }, connection))
     ))
     .mergeMap(() => websocket.connect().pausableBuffered(action$
       .filter(action => [FREEZE_WEBSOCKET, RELEASE_WEBSOCKET].includes(action.type))

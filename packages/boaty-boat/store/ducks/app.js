@@ -65,4 +65,5 @@ export const statsSelector = (state) => Object.keys(state.app.panes)
     ratio: (stats.ratio || 0) + (pane.ratio || 0),
     total: (stats.total || 0) + (pane.total || 0),
     done: (stats.done || 0) + (pane.done || 0),
+    connections: (stats.connections || []).concat(pane.host ? [{ host: pane.host, port: pane.port }] : [])
   }), {})

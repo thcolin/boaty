@@ -14,7 +14,7 @@ npm run install
 npm run webtorrent:daemon #[-- --quiet --port=9876]
 # in an other terminal
 npm run build
-npm run start #[-- --host=localhost --port=9876]
+npm run start #[-- --webtorrent-host=localhost --webtorrent-port=9876]
 ```
 
 ## Panes
