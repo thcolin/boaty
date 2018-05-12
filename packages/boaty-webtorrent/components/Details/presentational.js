@@ -1,10 +1,9 @@
 import React, { Component } from 'react'
 import Rx from 'rxjs'
 import humanize from 'humanize'
-import router from '@boaty/boat/services/router'
 import logger from '@boaty/boat/utils/logger'
 
-const style = (state, props) => ({
+const style = (state = {}, props = {}) => ({
   container: {
     top: props.style.top,
     height: props.style.height,
@@ -14,7 +13,7 @@ const style = (state, props) => ({
     },
     style: {
       border: {
-        fg: state.focused ? 'blue' : 'grey'
+        fg: props.focused ? 'blue' : 'grey'
       },
     }
   },
@@ -35,8 +34,6 @@ const style = (state, props) => ({
 })
 
 export default class Details extends Component {
-  static uri = '@boaty/webtorrent/details'
-
   constructor(props) {
     super(props)
 
@@ -45,29 +42,16 @@ export default class Details extends Component {
       scroll: 0
     }
 
-    this.state = {
-      focused: false
-    }
-
     this.handleMove = this.handleMove.bind(this)
-  }
-
-  componentWillMount() {
-    router.register(Details.uri).takeWhile(() => this.refs.self).subscribe(() => this.refs.self.focus())
   }
 
   componentDidMount() {
     // Events
     const keys$ = Rx.Observable.fromEvent(this.refs.self, 'element keypress', false, (el, ch, key) => ({ el, ch, key }))
     const move$ = keys$.filter(event => ['up', 'down'].includes(event.key.full))
-    const blur$ = Rx.Observable.fromEvent(this.refs.self, 'element blur')
-    const focus$ = Rx.Observable.fromEvent(this.refs.self, 'element focus')
 
     // Move
     move$.subscribe(this.handleMove)
-
-    // Focus
-    Rx.Observable.merge(focus$.mapTo(true), blur$.mapTo(false)).subscribe(focused => this.setState({ focused }))
   }
 
   shouldComponentUpdate(props, state) {
@@ -78,7 +62,11 @@ export default class Details extends Component {
     return true
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(props, state) {
+    if (!props.focused && this.props.focused) {
+      this.refs.self.focus()
+    }
+
     this.refs.self.select(this.position.selected + 1) // add headers row
     this.refs.self.setScrollPerc(this.position.scroll)
   }
@@ -115,9 +103,9 @@ export default class Details extends Component {
   }
 
   render() {
-    logger.ignore('Render', Details.uri, [this.props.name])
-    const { item } = this.props
+    const { item, uri } = this.props
     const rows = this.shapize(item)
+    logger.ignore('Render', uri, [this.props.name])
 
     return (
       <box label="Details" {...style(this.state, this.props).container}>

@@ -3,10 +3,9 @@ import Rx from 'rxjs'
 import humanize from 'humanize'
 import p from 'path'
 import opn from 'opn'
-import router from '@boaty/boat/services/router'
 import logger from '@boaty/boat/utils/logger'
 
-const style = (state, props) => ({
+const style = (state = {}, props = {}) => ({
   container: {
     top: props.style.top,
     height: props.style.height,
@@ -16,7 +15,7 @@ const style = (state, props) => ({
     },
     style: {
       border: {
-        fg: state.focused ? 'blue' : 'grey'
+        fg: props.focused ? 'blue' : 'grey'
       },
     }
   },
@@ -34,8 +33,6 @@ const style = (state, props) => ({
 })
 
 export default class Files extends Component {
-  static uri = '@boaty/webtorrent/files'
-
   constructor(props) {
     super(props)
 
@@ -44,37 +41,28 @@ export default class Files extends Component {
       scroll: 0
     }
 
-    this.state = {
-      focused: false
-    }
-
     this.handleMove = this.handleMove.bind(this)
     this.handleSelect = this.handleSelect.bind(this)
-  }
-
-  componentWillMount() {
-    router.register(Files.uri).takeWhile(() => this.refs.self).subscribe(() => this.refs.self.focus())
   }
 
   componentDidMount() {
     // Events
     const keys$ = Rx.Observable.fromEvent(this.refs.self, 'element keypress', false, (el, ch, key) => ({ el, ch, key }))
     const move$ = keys$.filter(event => ['up', 'down'].includes(event.key.full))
-    const blur$ = Rx.Observable.fromEvent(this.refs.self, 'element blur')
-    const focus$ = Rx.Observable.fromEvent(this.refs.self, 'element focus')
     const select$ = Rx.Observable.fromEvent(this.refs.self, 'select')
 
     // Move
     move$.subscribe(this.handleMove)
 
-    // Focus
-    Rx.Observable.merge(focus$.mapTo(true), blur$.mapTo(false)).subscribe(focused => this.setState({ focused }))
-
     // Select
     select$.subscribe(this.handleSelect)
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(props, state) {
+    if (!props.focused && this.props.focused) {
+      this.refs.self.focus()
+    }
+
     this.refs.self.select(this.position.selected)
     this.refs.self.setScrollPerc(this.position.scroll)
   }
@@ -96,9 +84,9 @@ export default class Files extends Component {
   }
 
   render() {
-    logger.ignore('Render', Files.uri, [this.props.path])
-    const { path, files } = this.props
+    const { path, files, uri } = this.props
     const rows = this.shapize(path, files)
+    logger.ignore('Render', uri, [this.props.path])
 
     return (
       <box label="Files" {...style(this.state, this.props).container}>

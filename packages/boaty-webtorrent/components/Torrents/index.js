@@ -5,8 +5,8 @@ import { freezeWebsocket, releaseWebsocket } from '@boaty/webtorrent/store/ducks
 import Torrents from './presentational'
 
 const mapStateToProps = (state) => ({
-  loading: !state.websocket.online,
-  selected: state.torrents.selected,
+  loading: !state.webtorrent.websocket.online,
+  selected: state.webtorrent.torrents.selected,
   torrents: partialTorrentsSelector(state),
 })
 

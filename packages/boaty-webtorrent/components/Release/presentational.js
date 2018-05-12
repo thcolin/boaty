@@ -1,11 +1,10 @@
 import React, { Component } from 'react'
 import Rx from 'rxjs'
-import router from '@boaty/boat/services/router'
 import oleoo from 'oleoo'
 import logger from '@boaty/boat/utils/logger'
 
 const COMPONENT = 'webtorrent/release'
-const style = (state, props) => ({
+const style = (state = {}, props = {}) => ({
   container: {
     top: props.style.top,
     height: props.style.height,
@@ -15,7 +14,7 @@ const style = (state, props) => ({
     },
     style: {
       border: {
-        fg: state.focused ? 'blue' : 'grey'
+        fg: props.focused ? 'blue' : 'grey'
       },
     }
   },
@@ -36,27 +35,10 @@ const style = (state, props) => ({
 })
 
 export default class Release extends Component {
-  static uri = '@boaty/webtorrent/release'
-
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      focused: false
+  componentDidUpdate(props, state) {
+    if (!props.focused && this.props.focused) {
+      this.refs.self.focus()
     }
-  }
-
-  componentDidMount() {
-    // Events
-    const blur$ = Rx.Observable.fromEvent(this.refs.self, 'element blur')
-    const focus$ = Rx.Observable.fromEvent(this.refs.self, 'element focus')
-
-    // Focus
-    Rx.Observable.merge(focus$.mapTo(true), blur$.mapTo(false)).subscribe(focused => this.setState({ focused }))
-  }
-
-  componentWillMount() {
-    router.register(Release.uri).subscribe(() => this.refs.self.focus())
   }
 
   shapize (name) {
@@ -113,9 +95,9 @@ export default class Release extends Component {
   }
 
   render () {
-    logger.ignore('Render', Release.uri, [this.props.name])
-    const { name } = this.props
+    const { name, uri } = this.props
     const rows = this.shapize(name)
+    logger.ignore('Render', uri, [this.props.name])
 
     return (
       <box label="Release" {...style(this.state, this.props).container}>

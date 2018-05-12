@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import Drawer from '@boaty/boat/components/Drawer'
+import Route from '@boaty/boat/components/Route'
 import Torrents from '@boaty/webtorrent/components/Torrents'
 import Details from '@boaty/webtorrent/components/Details'
 import Files from '@boaty/webtorrent/components/Files'
@@ -11,14 +12,30 @@ export default class Pane extends Component {
     return (
       <box>
         <box top="0%" height="70%">
-          <Torrents />
+          <Route uri="@boaty/webtorrent/torrents" autofocus={true}>
+            <Torrents />
+          </Route>
         </box>
         <box top="70%" height="30%">
           <box left="0%" width="50%">
-            <Drawer components={[Details, Files, Release]} />
+            <Drawer elements={[
+              <Route uri="@boaty/webtorrent/details">
+                <Details />
+              </Route>,
+              <Route uri="@boaty/webtorrent/files">
+                <Files />
+              </Route>,
+              <Route uri="@boaty/webtorrent/release">
+                <Release />
+              </Route>
+            ]} />
           </box>
           <box left="50%" width="50%">
-            <Drawer components={[Pieces]} />
+            <Drawer elements={[
+              <Route uri="@boaty/webtorrent/pieces">
+                <Pieces />
+              </Route>
+            ]} />
           </box>
         </box>
       </box>

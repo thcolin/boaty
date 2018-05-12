@@ -3,10 +3,9 @@ import Spinner from '@boaty/boat/components/Spinner'
 import Rx from 'rxjs'
 import humanize from 'humanize'
 import opn from 'opn'
-import router from '@boaty/boat/services/router'
 import logger from '@boaty/boat/utils/logger'
 
-const style = state => ({
+const style = (state = {}, props = {}) => ({
   container: {
     height: '100%',
     width: '100%',
@@ -15,7 +14,7 @@ const style = state => ({
     },
     style: {
       border: {
-        fg: state.focused ? 'blue' : 'grey'
+        fg: props.focused ? 'blue' : 'grey'
       }
     }
   },
@@ -40,8 +39,6 @@ const style = state => ({
 })
 
 export default class Torrents extends Component {
-  static uri = '@boaty/webtorrent/torrents'
-
   constructor(props) {
     super(props)
 
@@ -60,10 +57,6 @@ export default class Torrents extends Component {
     this.handleDelete = this.handleDelete.bind(this)
   }
 
-  componentWillMount() {
-    router.register(Torrents.uri, true).subscribe(() => this.refs.self.focus())
-  }
-
   componentDidMount() {
     // Events
     const keys$ = Rx.Observable.fromEvent(this.refs.self, 'element keypress', false, (el, ch, key) => ({ el, ch, key }))
@@ -73,7 +66,6 @@ export default class Torrents extends Component {
     const delete$ = keys$.filter(event => 'delete' === event.key.full)
     const move$ = keys$.filter(event => ['up', 'down'].includes(event.key.full))
     const blur$ = Rx.Observable.fromEvent(this.refs.self, 'element blur')
-    const focus$ = Rx.Observable.fromEvent(this.refs.self, 'element focus')
 
     // Open
     open$.subscribe(this.handleOpen)
@@ -92,12 +84,13 @@ export default class Torrents extends Component {
       move$.do(() => this.props.onFreeze()).do(event => this.position.scroll = event.el.getScrollPerc()).debounceTime(500),
       move$.sample(blur$)
     ).subscribe(this.handleSelect)
-
-    // Focus
-    Rx.Observable.merge(focus$.mapTo(true), blur$.mapTo(false)).subscribe(focused => this.setState({ focused }))
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(props, state) {
+    if (!props.focused && this.props.focused) {
+      this.refs.self.focus()
+    }
+
     this.refs.self.select(this.props.selected + 1) // add headers row
     this.refs.self.setScrollPerc(this.position.scroll)
   }
@@ -148,7 +141,7 @@ export default class Torrents extends Component {
     ])
 
     const pad = rows.reduce((total, row) => {
-      const current = row.filter((value, index) => index !== 1).reduce((total, current) => total += (current.length + style({}).table.pad), 0)
+      const current = row.filter((value, index) => index !== 1).reduce((total, current) => total += (current.length + style().table.pad), 0)
       return total > current ? total : current
     }, 0)
 
@@ -161,19 +154,19 @@ export default class Torrents extends Component {
   }
 
   render() {
-    logger.ignore('Render', Torrents.uri, [this.props.selected])
-    const { torrents, loading } = this.props
+    const { torrents, loading, uri } = this.props
     const rows = this.shapize(torrents)
+    logger.ignore('Render', uri, [this.props.selected])
 
     return (
-      <box label="Torrents" {...style(this.state).container}>
+      <box label="Torrents" {...style(this.state, this.props).container}>
         <listtable
           ref="self"
           keys={true}
           scroll={true}
           tags={true}
           rows={rows}
-          {...style(this.state).table}
+          {...style(this.state, this.props).table}
         />
         {loading && (
           <box top="50%" left="50%-6">

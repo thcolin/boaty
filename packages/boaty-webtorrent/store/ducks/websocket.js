@@ -2,7 +2,6 @@ import { combineEpics } from 'redux-observable'
 import Rx from 'rxjs'
 import '@boaty/webtorrent/utils/rxjs/operator/pausableBuffered'
 import websocket from '@boaty/webtorrent/store/websocket'
-import boatStore from '@boaty/boat/store'
 import * as appDuck from '@boaty/boat/store/ducks/app'
 import * as paneDuck from '@boaty/webtorrent/store/ducks/pane'
 import connection from '@boaty/webtorrent/utils/connection'
@@ -60,9 +59,6 @@ export const epic = combineEpics(
 
 export function subscribeWebsocketEpic(action$, store) {
   return action$.ofType(paneDuck.INIT)
-    .do(() => boatStore.dispatch(
-      appDuck.registerPane('webtorrent', Object.assign({ ready: store.getState().websocket.online }, connection))
-    ))
     .mergeMap(() => websocket.connect().pausableBuffered(action$
       .filter(action => [FREEZE_WEBSOCKET, RELEASE_WEBSOCKET].includes(action.type))
       .map(action => action.type === FREEZE_WEBSOCKET)
@@ -78,8 +74,9 @@ export function fetchStatsEpic(action$) {
 export function amendPaneEpic(action$, store) {
   return action$
     .filter(action => [actions.FILL_STATS, SUCCESS_WEBSOCKET, FAILURE_WEBSOCKET].includes(action.type))
-    .do(action => boatStore.dispatch(
-      appDuck.amendPane('webtorrent', Object.assign({ ready: store.getState().websocket.online }, action.stats))
-    ))
-    .mergeMap(() => Rx.Observable.never())
+    .map(action => appDuck.amendPane('webtorrent', Object.assign(
+      { ready: store.getState().webtorrent.websocket.online },
+      connection,
+      action.stats
+    )))
 }

@@ -30,6 +30,7 @@ See below for available `panes`:
     * [x] Open
     * [x] Delete
     * [x] Erase
+  * [ ] Push-Open-Load (magnet/.torrent to distant daemon)
   * [ ] Stream / Cast (see [webtorrent/webtorrent-cli](https://github.com/webtorrent/webtorrent-cli/blob/master/bin/cmd.js#L429)
     * AirPlay
     * Chromecast
@@ -95,6 +96,11 @@ You can customize your configuration in `config.json` file:
 # Help
 * Rendering `screenshot.svg` from `asciinema`: `svg-term --cast=CAST_ID --out screenshot.svg --term=iterm2 --profile=~/.itermcolors --window`
 
+# Inspiration
+* [rtorrent-ps](http://rtorrent-ps.readthedocs.io/en/latest/)
+* [rtorrent-webui](http://3.bp.blogspot.com/-qtraNrkge3k/T3IeePHeZCI/AAAAAAAABP4/K3ZY6n-ioxg/s1600/rtorrent_with_encryption.JPG)
+* [transmission-gui](https://transmissionbt.com/images/screenshots/Mac-Large.png)
+
 # Roadmap
 * Implement `standardjs`
 * Write `tests`
@@ -121,6 +127,10 @@ You can customize your configuration in `config.json` file:
     * [ ] `ratio-limit`
       * should listen for `torrent.on('upload')` until limit and then `torrent.pause()` (workable)
 * `@boaty/webtorrent`
+  * Improve `redux` & `websocket` integration with [Redux WebSocket Integration](https://medium.com/@ianovenden/redux-websocket-integration-c1a0d22d3189)
+  * Look at [Writing a BitTorrent Client](https://luminarys.com/posts/writing-a-bittorrent-client.html)
+  * Use `docker` or `pm2` to daemonize daemon
+    * see [pm2 documentation](http://pm2.keymetrics.io/docs/usage/quick-start/)
   * `Files` should be able to open distant (`host !== 'localhost'`) files
   * `Daemon` should save torrents state (stoped) and load it on boot
   * Should send `FILL_TORRENTS` every 10s to force update

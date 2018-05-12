@@ -7,8 +7,6 @@ export const INIT = 'boaty/webtorrent/@@INIT'
 const INITIAL = {}
 
 export function reducer (state = INITIAL, action = {}) {
-  logger.broadcast('Redux', action.type)
-
   switch (action.type) {
     default:
       return state

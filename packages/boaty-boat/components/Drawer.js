@@ -1,14 +1,16 @@
 import React, { Component } from 'react'
-import Details from '@boaty/webtorrent/components/Details'
-import Pieces from '@boaty/webtorrent/components/Pieces'
-import router from '@boaty/boat/services/router'
+import { connect } from 'react-redux'
 
 const style = (state) => ({
   top: state.index > state.opened ? `100%-${(state.length - state.index) + 1}` : state.index,
   height: state.index === state.opened ? `100%-${state.opened + (state.length - state.index) - Math.abs(state.index === state.last)}` : 2
 })
 
-export default class Drawer extends Component {
+const mapStateToProps = (state) => ({
+  focused: state.router.focused
+})
+
+class Drawer extends Component {
   constructor(props) {
     super(props)
 
@@ -17,30 +19,30 @@ export default class Drawer extends Component {
     }
   }
 
-  componentWillMount() {
-    router
-      .listen()
-      .filter(uri => this.props.components.map(component => component.uri).includes(uri))
-      .subscribe(uri => this.setState({
-        opened: this.props.components.map(component => component.uri).indexOf(uri)
-      }))
+  componentWillUpdate(props) {
+    const index = this.props.elements.map(element => element.props.uri).indexOf(props.focused)
+    if (index !== -1 && index !== this.state.opened) {
+      this.setState({
+        opened: index
+      })
+    }
   }
 
   render() {
     const { opened } = this.state
-    const { components } = this.props
+    const { elements } = this.props
 
     return (
       <box>
-        {components.map((component, index) => React.createElement(
-          component,
+        {elements.map((element, index) => React.cloneElement(
+          element,
           {
-            key: component.uri,
+            key: element.props.uri,
             style: style({
               index: index,
-              length: components.length,
+              length: elements.length,
               opened: opened,
-              last: components.length - 1
+              last: elements.length - 1
             }),
             opened: opened === index
           }
@@ -49,3 +51,5 @@ export default class Drawer extends Component {
     )
   }
 }
+
+export default connect(mapStateToProps)(Drawer)

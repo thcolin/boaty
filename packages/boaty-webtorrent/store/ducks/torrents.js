@@ -71,22 +71,22 @@ export function reducer (state = INITIAL, action = {}) {
 
 // Selectors
 export const partialTorrentsSelector = (state) => (
-  state.torrents.result.map(hash => ({
+  state.webtorrent.torrents.result.map(hash => ({
     hash,
-    done: state.torrents.entities[hash].done,
-    stoped: state.torrents.entities[hash].stoped,
-    name: state.torrents.entities[hash].name,
-    downloadSpeed: state.torrents.entities[hash].downloadSpeed,
-    uploadSpeed: state.torrents.entities[hash].uploadSpeed,
-    progress: state.torrents.entities[hash].progress,
-    total: state.torrents.entities[hash].total,
-    path: state.torrents.entities[hash].path,
-    timeRemaining: state.torrents.entities[hash].timeRemaining,
+    done: state.webtorrent.torrents.entities[hash].done,
+    stoped: state.webtorrent.torrents.entities[hash].stoped,
+    name: state.webtorrent.torrents.entities[hash].name,
+    downloadSpeed: state.webtorrent.torrents.entities[hash].downloadSpeed,
+    uploadSpeed: state.webtorrent.torrents.entities[hash].uploadSpeed,
+    progress: state.webtorrent.torrents.entities[hash].progress,
+    total: state.webtorrent.torrents.entities[hash].total,
+    path: state.webtorrent.torrents.entities[hash].path,
+    timeRemaining: state.webtorrent.torrents.entities[hash].timeRemaining,
   }))
 )
 
 export const siftedTorrentsSelector = (state) => (
-  state.torrents.entities[state.torrents.result[state.torrents.selected]]
+  state.webtorrent.torrents.entities[state.webtorrent.torrents.result[state.webtorrent.torrents.selected]]
 )
 
 // Epics
