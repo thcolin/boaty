@@ -87,7 +87,8 @@ You can customize your configuration in `config.json` file:
 * `Space`: Pause / Resume (torrent in `Torrents`)
 * `Backspace`: Remove (torrent in `Torrents`)
 * `Delete`: Delete (torrent in `Torrents`)
-* `Esc|q`: Quit
+* `Esc`: Close modal
+* `C-c|q`: Quit
 
 # About
 * `Footer`:

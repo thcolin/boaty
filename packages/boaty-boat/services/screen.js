@@ -7,6 +7,6 @@ const screen = blessed.screen({
   title: `${context.name}`
 })
 
-screen.key(['escape', 'q', 'C-c'], (ch, key) => process.exit(0))
+screen.key(['q', 'C-c'], (ch, key) => process.exit(0))
 
 export default screen

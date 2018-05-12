@@ -30,7 +30,7 @@ export function reducer (state = INITIAL, action = {}) {
     case RESCIND_ROUTE:
       return {
         ...state,
-        routes: [].concat(state.routes).splice(state.routes.indexOf(action.uri), 1)
+        routes: state.routes.filter(route => route !== action.uri)
       }
     default:
       return state
