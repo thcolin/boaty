@@ -3,6 +3,7 @@ const EventEmitter = require('events')
 const Rx = require('rxjs')
 const p = require('path')
 const fs = require('fs')
+const mkdirp = require('mkdirp')
 const rimraf = require('rimraf')
 
 class Daemon extends EventEmitter {
@@ -23,6 +24,16 @@ class Daemon extends EventEmitter {
 
     this.client = new WebTorrent()
     this.client.on('error', e => this.emit('error', 'WebTorrent/boaty', e))
+
+    process.umask(0)
+    mkdirp.sync(this.paths.store)
+    mkdirp.sync(this.paths.trash)
+
+    fs.access(this.paths.download, fs.constants.F_OK | fs.constants.R_OK | fs.constants.W_OK, (err) => {
+      if (err) {
+        this.emit('error', 'WebTorrent/boaty', err)
+      }
+    })
 
     fs.readdir(this.paths.store, (e, files) => (files || [])
       .filter(filename => p.extname(filename) === '.torrent')
@@ -47,12 +58,16 @@ class Daemon extends EventEmitter {
     const copy = p.resolve(this.paths.store, p.basename(path))
 
     if (fs.existsSync(path) && !fs.existsSync(copy)) {
-      fs.copyFile(path, copy, () => {
-        if (this.config['watch-delete']) {
-          rimraf(path, { glob: false }, (e) => e && this.emit('error', 'WebTorrent/boaty/drain/delete', e))
-        }
+      fs.copyFile(path, copy, (err) => {
+        if (err) {
+          this.emit('error', 'WebTorrent/boaty', err)
+        } else {
+          if (this.config['watch-delete']) {
+            rimraf(path, { glob: false }, (e) => e && this.emit('error', 'WebTorrent/boaty/drain/delete', e))
+          }
 
-        this.handle(copy)
+          this.handle(copy)
+        }
       })
     }
   }
