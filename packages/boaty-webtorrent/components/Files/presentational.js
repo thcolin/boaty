@@ -3,6 +3,7 @@ import Rx from 'rxjs'
 import humanize from 'humanize'
 import p from 'path'
 import opn from 'opn'
+import connection from '@boaty/webtorrent/utils/connection'
 import logger from '@boaty/boat/utils/logger'
 
 const style = (state = {}, props = {}) => ({
@@ -74,9 +75,19 @@ export default class Files extends Component {
 
   handleSelect(item) {
     const content = item.content.trim()
-    const value = content === this.props.path ? content : p.join(this.props.path, content)
-    logger.spawn('Files', value)
-    opn(value)
+    const path = content === this.props.path ? content : p.join(this.props.path, content)
+    const prefix = connection.host === 'localhost' ? null : [
+      `sftp://`,
+      connection.sftp.user,
+      !!connection.sftp.user && '@',
+      connection.host,
+      !!connection.sftp.port && ':',
+      connection.sftp.port,
+      '/'
+    ].filter(v => v).join('')
+
+    logger.spawn('Files', path, prefix)
+    opn(`${prefix}${path}`)
   }
 
   shapize(path, files) {

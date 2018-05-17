@@ -3,6 +3,7 @@ import Spinner from '@boaty/boat/components/Spinner'
 import Rx from 'rxjs'
 import humanize from 'humanize'
 import opn from 'opn'
+import connection from '@boaty/webtorrent/utils/connection'
 import logger from '@boaty/boat/utils/logger'
 
 const style = (state = {}, props = {}) => ({
@@ -111,7 +112,19 @@ export default class Torrents extends Component {
   }
 
   handleOpen(event) {
-    opn(this.props.torrents[event.el.selected - 1].path)
+    const path = this.props.torrents[event.el.selected - 1].path
+    const prefix = connection.host === 'localhost' ? null : [
+      `sftp://`,
+      connection.sftp.user,
+      !!connection.sftp.user && '@',
+      connection.host,
+      !!connection.sftp.port && ':',
+      connection.sftp.port,
+      '/'
+    ].filter(v => v).join('')
+
+    logger.spawn('Torrents', path, prefix)
+    opn(`${prefix}${path}`)
   }
 
   handleToggle(event) {

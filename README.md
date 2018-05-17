@@ -14,7 +14,18 @@ npm run install
 npm run webtorrent:daemon #[-- --quiet --port=9876]
 # in an other terminal
 npm run build
-./bin/boaty #[--webtorrent-host=localhost --webtorrent-port=9876 --config=./config.json]
+./bin/boaty #[...params]
+```
+
+## Params
+See below all available params:
+```bash
+boaty #[...params]
+  --config=./config.json # path to config.json
+  --webtorrent-host=localhost # webtorrent daemon host
+  --webtorrent-port=9876 # webtorrent daemon port
+  --webtorrent-sftp-user=me # webtorrent sftp user (for Files open)
+  --webtorrent-sftp-port=22 # webtorrent sftp port (for Files open)
 ```
 
 ## Panes
@@ -134,6 +145,7 @@ You can customize your configuration in `config.json` file:
     * [ ] `ratio-limit`
       * should listen for `torrent.on('upload')` until limit and then `torrent.pause()` (workable)
 * `@boaty/webtorrent`
+  * Fix `ducks.torrents.selected` on `actions.ENHANCE_TORRENTS`
   * Handle magnet `daemon.import`
   * Confirm modal on `torrents.delete` and `torrents.remove`
   * Investigate for stucked torrents on `daemon.import`
