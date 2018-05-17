@@ -14,7 +14,7 @@ npm run install
 npm run webtorrent:daemon #[-- --quiet --port=9876]
 # in an other terminal
 npm run build
-npm run start #[-- --webtorrent-host=localhost --webtorrent-port=9876]
+./bin/boaty #[--webtorrent-host=localhost --webtorrent-port=9876 --config=./config.json]
 ```
 
 ## Panes
@@ -30,7 +30,7 @@ See below for available `panes`:
     * [x] Open
     * [x] Delete
     * [x] Erase
-  * [x] Push-Open-Load (magnet/.torrent to distant daemon)
+  * [x] Open-Push (magnet/.torrent to distant daemon)
   * [ ] Stream / Cast (see [webtorrent/webtorrent-cli](https://github.com/webtorrent/webtorrent-cli/blob/master/bin/cmd.js#L429)
     * AirPlay
     * Chromecast
@@ -88,6 +88,7 @@ You can customize your configuration in `config.json` file:
 # Keys
 * `Tab`: Switch between tiles (use `Shift` key for opposite direction)
 * `↓↑`: Move
+* `o`: Open import modal (push local `.torrent` file(s) to daemon)
 * `Enter`: Open (folders and files in `Files` tile, and path in `Torrents`)
 * `Space`: Pause / Resume (torrent in `Torrents`)
 * `Backspace`: Remove (torrent in `Torrents`)

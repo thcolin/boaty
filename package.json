@@ -5,11 +5,11 @@
   "description": "🌊⛴️ A p2p cli boat - or client, will work with webtorrent and dat",
   "main": "index.js",
   "scripts": {
-    "build": "browserify packages/boaty-boat/index.js -o build/cli --bare -p [bannerify --template '#!/usr/bin/env node\n'] && chmod +x build/cli",
-    "start": "./build/cli",
+    "build": "browserify packages/boaty-boat/index.js -o bin/boaty --bare -p [bannerify --template '#!/usr/bin/env node\n'] && chmod +x bin/boaty",
+    "start": "./bin/boaty",
     "webtorrent:daemon": "./packages/boaty-webtorrent/daemon/index.js",
     "debug": "tail -f ./debug.log | emojilog",
-    "playground": "browserify playground.js -o build/cli --bare -p [bannerify --template '#!/usr/bin/env node\n'] && chmod +x build/cli",
+    "playground": "browserify playground.js -o bin/boaty --bare -p [bannerify --template '#!/usr/bin/env node\n'] && chmod +x bin/boaty",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "browserify": {

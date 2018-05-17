@@ -1,5 +1,5 @@
 node_modules
-build
+bin
 playground.js
 debug.log
 **/*/daemon/store

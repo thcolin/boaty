@@ -14,11 +14,13 @@ class Footer extends Component {
     const commands = {
       'Tab': 'Switch',
       '↓↑': 'Move',
+      ' o ': 'Push',
       'Enter': 'Open',
       'Space': 'Pause-Resume',
       'Back': 'Remove',
       'Del': 'Delete',
-      'q': 'Quit',
+      'Esc': 'Close',
+      ' q ': 'Quit',
     }
 
     return (
