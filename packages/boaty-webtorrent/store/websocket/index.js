@@ -10,12 +10,12 @@ const subject$ = new Rx.Subject()
 const client = new Client()
 const websocket = {
   connect: () => subject$,
-  dispatch: async (action) => {
+  dispatch: async (message) => {
     try {
       await wait(client)
-      client.send(encode(action))
+      client.send(encode(message))
   	} catch (e) {
-  		return websocket.dispatch(action)
+  		return websocket.dispatch(message)
   	}
   }
 }

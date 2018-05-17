@@ -56,7 +56,10 @@ export default class Details extends Component {
 
   shouldComponentUpdate(props, state) {
     if (!props.item || !this.props.item || props.item.hash !== (this.props.item || {}).hash) {
-      this.position.selected = 0
+      this.position = {
+        selected: 0,
+        scroll: 0,
+      }
     }
 
     return true
@@ -68,7 +71,7 @@ export default class Details extends Component {
     }
 
     this.refs.self.select(this.position.selected + 1) // add headers row
-    this.refs.self.setScrollPerc(this.position.scroll)
+    this.refs.self.setScrollPerc(Math.min(100, this.position.scroll ? this.position.scroll + Math.ceil(this.refs.self.height / 2) : 0))
   }
 
   handleMove(event) {
@@ -112,7 +115,6 @@ export default class Details extends Component {
         <listtable
           ref="self"
           keys={true}
-          scroll={true}
           tags={true}
           rows={rows}
           {...style(this.state, this.props).list}

@@ -80,7 +80,7 @@ export default class Files extends Component {
   }
 
   shapize(path, files) {
-    return [path].concat(files.map(file => ` ${['.', file].join(p.sep)}`))
+    return [path].concat(files.map(file => ` ${file}`))
   }
 
   render() {

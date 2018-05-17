@@ -30,7 +30,7 @@ See below for available `panes`:
     * [x] Open
     * [x] Delete
     * [x] Erase
-  * [ ] Push-Open-Load (magnet/.torrent to distant daemon)
+  * [x] Push-Open-Load (magnet/.torrent to distant daemon)
   * [ ] Stream / Cast (see [webtorrent/webtorrent-cli](https://github.com/webtorrent/webtorrent-cli/blob/master/bin/cmd.js#L429)
     * AirPlay
     * Chromecast
@@ -73,9 +73,14 @@ You can customize your configuration in `config.json` file:
     ]
   },
   "@boaty/webtorrent": {
-    "download-dir": "/tmp/webtorrent/done",
-    "watch-dir": "/tmp/webtorrent/watch",
-    "watch-delete": true
+    "pane": {
+      "open-homedir": "/tmp/webtorrent/watch"
+    },
+    "daemon": {
+      "download-dir": "/tmp/webtorrent/done",
+      "watch-dir": "/tmp/webtorrent/watch",
+      "watch-delete": true
+    }
   }
 }
 ```
@@ -128,6 +133,9 @@ You can customize your configuration in `config.json` file:
     * [ ] `ratio-limit`
       * should listen for `torrent.on('upload')` until limit and then `torrent.pause()` (workable)
 * `@boaty/webtorrent`
+  * Handle magnet `daemon.import`
+  * Confirm modal on `torrents.delete` and `torrents.remove`
+  * Investigate for stucked torrents on `daemon.import`
   * Improve `redux` & `websocket` integration with [Redux WebSocket Integration](https://medium.com/@ianovenden/redux-websocket-integration-c1a0d22d3189)
   * Look at [Writing a BitTorrent Client](https://luminarys.com/posts/writing-a-bittorrent-client.html)
   * Use `docker` or `pm2` to daemonize daemon

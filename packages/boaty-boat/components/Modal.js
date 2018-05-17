@@ -28,7 +28,7 @@ class Modal extends Component {
   }
 
   componentDidUpdate(props, state) {
-    if (!this.state.hide) {
+    if (!this.state.hide && this.props.focused !== this.props.uri) {
       this.props.focusRoute(this.props.uri)
     } else if (!state.hide && this.state.hide) {
       this.props.focusRoute(this.state.previous)

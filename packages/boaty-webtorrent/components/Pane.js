@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import Drawer from '@boaty/boat/components/Drawer'
 import Route from '@boaty/boat/components/Route'
+import Modal from '@boaty/boat/components/Modal'
+import Open from '@boaty/webtorrent/components/Modals/Open'
 import Torrents from '@boaty/webtorrent/components/Torrents'
 import Details from '@boaty/webtorrent/components/Details'
 import Files from '@boaty/webtorrent/components/Files'
@@ -38,6 +40,9 @@ export default class Pane extends Component {
             ]} />
           </box>
         </box>
+        <Modal uri="@boaty/webtorrent/modals/open" hotkey="o">
+          <Open />
+        </Modal>
       </box>
     )
   }

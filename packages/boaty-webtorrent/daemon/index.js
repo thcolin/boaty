@@ -7,9 +7,10 @@ const PORT = argv.port || 9876
 const loggers = require('./loggers')(argv)
 
 loggers.daemon.timing('Booting...')
-const config = require('../../../config.json')['@boaty/webtorrent']
+const config = require('../../../config.json')['@boaty/webtorrent'].daemon
 const daemon = new (require('./daemon'))(config)
 daemon.on('handling', (torrent) => loggers.daemon.spawn('Handling', torrent.name))
+daemon.on('delete', (message) => loggers.daemon.ignore('Delete', message))
 daemon.on('error', (type, e) => loggers.daemon.error('Error', type, e))
 loggers.daemon.launch('Ready !')
 
@@ -86,6 +87,10 @@ socket.on('connection', (client) => {
             loggers.socket.output(feedback.type, group.length)
           })
         break
+      }
+
+      case actions.PAD_TORRENTS: {
+        daemon.import(action.payload)
       }
 
       case actions.PAUSE_TORRENT: {

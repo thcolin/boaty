@@ -1,4 +1,5 @@
 const WebTorrent = require('webtorrent')
+const parseTorrent = require('parse-torrent')
 const EventEmitter = require('events')
 const Rx = require('rxjs')
 const p = require('path')
@@ -54,6 +55,21 @@ class Daemon extends EventEmitter {
     })
   }
 
+  import(payload) {
+    const buffer = Buffer.from(payload)
+
+    try {
+      const torrent = parseTorrent(buffer)
+      const path = p.resolve(this.paths.store, `${torrent.name || torrent.infoHash}.torrent`)
+
+      if (!fs.existsSync(path)) {
+        fs.writeFile(path, buffer, (err) => err ? this.emit('error', 'WebTorrent/boaty', err) : this.handle(path))
+      }
+    } catch (e) {
+      this.emit('error', 'WebTorrent/boaty', e)
+    }
+  }
+
   drain(path) {
     const copy = p.resolve(this.paths.store, p.basename(path))
 
@@ -73,9 +89,7 @@ class Daemon extends EventEmitter {
   }
 
   handle(uri, fresh = true) {
-    const torrent = this.client.add(uri, { path: this.paths.download })
-
-    torrent.on('ready', () => {
+    const torrent = this.client.add(uri, { path: this.paths.download }, () => {
       torrent.uri = uri
 
       if (fresh) {
@@ -86,6 +100,7 @@ class Daemon extends EventEmitter {
 
       Rx.Observable
         .merge(...this.events.map(event => Rx.Observable.fromEvent(torrent, event)))
+        .do(value => ['warning', 'error'].includes(value) && this.handle(uri))
         .auditTime(this.options.duration)
         .map(() => this.diff(torrent.infoHash))
         .filter(differencies => differencies)
@@ -107,7 +122,7 @@ class Daemon extends EventEmitter {
     return {
       hash: payload.infoHash,
       uri: payload.uri,
-      name: payload.name,
+      name: payload.name || payload.infoHash,
       announce: payload.announce,
       path: payload.path,
       created: payload.created,
@@ -149,6 +164,8 @@ class Daemon extends EventEmitter {
       this.emit('amend', this.diff(hash))
       this.client.remove(hash)
     }
+
+    return torrent
   }
 
   resume(hash) {
@@ -158,31 +175,42 @@ class Daemon extends EventEmitter {
       delete this.sideline[hash]
       this.handle(torrent.uri, false)
     }
+
+    return torrent
   }
 
   remove(hash) {
     const torrent = this.get(hash, true)
 
     if (torrent) {
-      fs.copyFile(torrent.uri, p.resolve(this.paths.trash, p.basename(torrent.uri)), () => {
+      if (fs.existsSync(torrent.uri)) {
+        fs.copyFile(torrent.uri, p.resolve(this.paths.trash, p.basename(torrent.uri)), () => {
+          rimraf(torrent.uri, { glob: false }, (e) => e && this.emit('error', 'WebTorrent/boaty/drain/delete', e))
+        })
+      }
+
+      try {
         this.client.remove(hash)
         this.emit('truncate', hash)
-        rimraf(torrent.uri, { glob: false }, (e) => e && this.emit('error', 'WebTorrent/boaty/drain/delete', e))
-      })
+      } catch (e) {
+        delete this.sideline[hash]
+        this.emit('truncate', hash)
+      }
     }
+
+    return torrent
   }
 
   delete(hash) {
-    const torrent = this.get(hash, true)
+    const torrent = this.remove(hash)
+    const path = torrent ? p.resolve(torrent.path, torrent.files.shift().split(p.sep).shift()) : null
 
-    if (torrent) {
-      fs.copyFile(torrent.uri, p.resolve(this.paths.trash, p.basename(torrent.uri)), () => {
-        this.client.remove(hash)
-        this.emit('truncate', hash)
-        rimraf(torrent.uri, { glob: false }, (e) => e && this.emit('error', 'WebTorrent/boaty/drain/delete', e))
-        rimraf(p.resolve(torrent.path, torrent.files.shift().split(p.sep).shift()), { glob: false }, (e) => e && this.emit('error', 'WebTorrent/boaty/drain/delete', e))
-      })
+    if (torrent && path && fs.existsSync(path) && path !== p.resolve(this.paths.download)) {
+      this.emit('delete', path)
+      rimraf(path, { glob: false }, (e) => e && this.emit('error', 'WebTorrent/boaty/drain/delete', e))
     }
+
+    return torrent
   }
 
   diff(hash) {

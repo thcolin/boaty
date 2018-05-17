@@ -28,7 +28,7 @@ const style = (state = {}, props = {}) => ({
       cell: {
         selected: {
           fg: 'black',
-          bg: 'brightwhite'
+          bg: 'white'
         }
       },
       header: {
@@ -45,6 +45,8 @@ export default class Torrents extends Component {
     this.position = {
       scroll: 0
     }
+
+    this.blur$ = new Rx.Subject()
 
     this.state = {
       focused: false
@@ -65,7 +67,6 @@ export default class Torrents extends Component {
     const remove$ = keys$.filter(event => 'backspace' === event.key.full)
     const delete$ = keys$.filter(event => 'delete' === event.key.full)
     const move$ = keys$.filter(event => ['up', 'down'].includes(event.key.full))
-    const blur$ = Rx.Observable.fromEvent(this.refs.self, 'element blur')
 
     // Open
     open$.subscribe(this.handleOpen)
@@ -81,9 +82,17 @@ export default class Torrents extends Component {
 
     // Move
     Rx.Observable.merge(
-      move$.do(() => this.props.onFreeze()).do(event => this.position.scroll = event.el.getScrollPerc()).debounceTime(500),
-      move$.sample(blur$)
-    ).subscribe(this.handleSelect)
+      move$.do(() => this.props.onFreeze()).debounceTime(500),
+      move$.sample(this.blur$).do(() => logger.issue('blur'))
+    )
+    .do(event => this.position.scroll = event.el.getScrollPerc())
+    .subscribe(this.handleSelect)
+  }
+
+  componentWillUpdate(props) {
+    if (!props.focused && this.props.focused) {
+      this.blur$.next(true)
+    }
   }
 
   componentDidUpdate(props, state) {
@@ -96,6 +105,7 @@ export default class Torrents extends Component {
   }
 
   handleSelect(event) {
+    logger.issue('handleSelect', event.el.selected - 1)
     this.props.onSelect(event.el.selected - 1) // remove headers row
     this.props.onRelease()
   }
@@ -137,7 +147,7 @@ export default class Torrents extends Component {
       (torrent.stoped ? '-' : humanize.speed(torrent.uploadSpeed)),
       `${humanize.numberFormat(torrent.progress * 100, 0)}%`,
       humanize.filesize(torrent.total),
-      (torrent.done || torrent.stoped) ? '-' : typeof torrent.timeRemaining === 'number' ? humanize.relativeTime((Date.now() + torrent.timeRemaining) / 1000).substring(3) : '∞',
+      (torrent.done || torrent.stoped) ? '-' : typeof torrent.timeRemaining === 'number' ? humanize.duration(torrent.timeRemaining) : '∞',
     ])
 
     const pad = rows.reduce((total, row) => {

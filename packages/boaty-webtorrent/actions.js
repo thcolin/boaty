@@ -21,6 +21,7 @@ actions.ENHANCE_TORRENTS = 'boaty/webtorrent/torrents/ENHANCE_TORRENTS'
 actions.TRUNCATE_TORRENTS = 'boaty/webtorrent/torrents/TRUNCATE_TORRENTS'
 actions.AMEND_TORRENTS = 'boaty/webtorrent/torrents/AMEND_TORRENTS'
 actions.SIFT_TORRENTS = 'boaty/webtorrent/torrents/SIFT_TORRENTS'
+actions.PAD_TORRENTS = 'boaty/webtorrent/torrents/PAD_TORRENTS'
 
 actions.fetchTorrents = () => ({
   type: actions.FETCH_TORRENTS
@@ -58,6 +59,11 @@ actions.amendTorrents = (group) => ({
 actions.siftTorrents = (index) => ({
   type: actions.SIFT_TORRENTS,
   index
+})
+
+actions.padTorrents = (payload) => ({
+  type: actions.PAD_TORRENTS,
+  payload
 })
 
 // Torrent

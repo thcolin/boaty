@@ -19,7 +19,7 @@ export function reducer (state = INITIAL, action = {}) {
       return INITIAL
     case actions.FILL_TORRENTS:
       return {
-        selected: 0,
+        selected: (state.entities === state.selected ? 1 : 0),
         entities: action.entities,
         result: action.result,
       }
@@ -48,14 +48,23 @@ export function reducer (state = INITIAL, action = {}) {
             }), {})
         }
       }
-    case actions.TRUNCATE_TORRENTS:
-      return {
+    case actions.TRUNCATE_TORRENTS: {
+      const next = {
         ...state,
         entities: Object.values(state.entities)
           .filter(torrent => torrent.hash !== action.hash)
           .reduce((entities, torrent) => Object.assign(entities, { [torrent.hash]: torrent }), {}),
         result: state.result.filter(hash => hash !== action.hash)
       }
+
+      if (state.selected === state.result.indexOf(action.hash)) {
+        next.selected = Math.min(next.result.length - 1, Math.max(0, next.selected - 1))
+      } else {
+        next.selected = next.result.indexOf(state.result[state.selected])
+      }
+
+      return next
+    }
     case actions.AMEND_TORRENT:
       return {
         ...state,
@@ -93,7 +102,8 @@ export const siftedTorrentsSelector = (state) => (
 export const epic = combineEpics(
   fetchTorrentsEpic,
   observeTorrentsEpic,
-  applyTorrentEPic,
+  applyTorrentsEpic,
+  applyTorrentEpic,
 )
 
 export function fetchTorrentsEpic(action$) {
@@ -108,7 +118,16 @@ export function observeTorrentsEpic(action$) {
     .mergeMap(() => Rx.Observable.never())
 }
 
-export function applyTorrentEPic(action$) {
+export function applyTorrentsEpic(action$) {
+  return action$
+    .filter(action => [
+      actions.PAD_TORRENTS
+    ].includes(action.type))
+    .do(action => websocket.dispatch(action))
+    .mergeMap(() => Rx.Observable.never())
+}
+
+export function applyTorrentEpic(action$) {
   return action$
     .filter(action => [
       actions.PAUSE_TORRENT,
