@@ -9,7 +9,7 @@ const loggers = require('./loggers')(argv)
 loggers.daemon.timing('Booting...')
 const config = require('../../../config.json')['@boaty/webtorrent'].daemon
 const daemon = new (require('./daemon'))(config)
-daemon.on('handling', (torrent) => loggers.daemon.spawn('Handling', torrent.name))
+daemon.on('handling', (torrent) => loggers.daemon.spawn('Handling', torrent.name || torrent.infoHash))
 daemon.on('delete', (message) => loggers.daemon.ignore('Delete', message))
 daemon.on('error', (type, e) => loggers.daemon.error('Error', type, e))
 loggers.daemon.launch('Ready !')
@@ -33,7 +33,12 @@ socket.on('connection', (client) => {
 
   client.on('message', payload => {
     const action = transport.decode(payload)
-    loggers.socket.input(action.type, action)
+    loggers.socket.input(action.type, Object.keys(action)
+      .filter(key => key !== 'type')
+      .reduce((obj, key) => Object.assign(obj, {
+        [key]: ['boolean', 'number', 'string'].includes(typeof action[key]) ? action[key] : `[${typeof action[key]}]`
+      }), {})
+    )
 
     switch (action.type) {
       case actions.OBSERVE_STATS: {
