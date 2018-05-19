@@ -82,6 +82,7 @@ export function reducer (state = INITIAL, action = {}) {
 export const partialTorrentsSelector = (state) => (
   state.webtorrent.torrents.result.map(hash => ({
     hash,
+    ready: state.webtorrent.torrents.entities[hash].ready,
     done: state.webtorrent.torrents.entities[hash].done,
     stoped: state.webtorrent.torrents.entities[hash].stoped,
     name: state.webtorrent.torrents.entities[hash].name,

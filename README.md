@@ -146,8 +146,7 @@ You can customize your configuration in `config.json` file:
       * should listen for `torrent.on('upload')` until limit and then `torrent.pause()` (workable)
 * `@boaty/webtorrent`
   * Fix `ducks.torrents.selected` on `actions.ENHANCE_TORRENTS`
-  * Use `docker` or `pm2` to daemonize daemon
-    * see [pm2 documentation](http://pm2.keymetrics.io/docs/usage/quick-start/)
+  * Use `docker` to daemonize daemon
   * Handle magnet `daemon.import`
   * Confirm modal on `torrents.delete` and `torrents.remove`
   * Investigate for stucked torrents on `daemon.import`

@@ -151,6 +151,7 @@ class Daemon extends EventEmitter {
       announce: payload.announce,
       path: payload.path,
       created: payload.created,
+      ready: payload.ready,
       stoped: !!payload.stoped,
       done: payload.done,
       timeRemaining: payload.timeRemaining,
