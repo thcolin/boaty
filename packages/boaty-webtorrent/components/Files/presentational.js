@@ -75,8 +75,8 @@ export default class Files extends Component {
 
   handleSelect(item) {
     const content = item.content.trim()
-    const path = content === this.props.path ? content : p.join(this.props.path, content)
-    const prefix = connection.host === 'localhost' ? null : [
+    const path = content.substr(0, this.props.path.length) === this.props.path ? content : p.join(this.props.path, content)
+    const prefix = connection.host === 'localhost' ? '' : [
       `sftp://`,
       connection.sftp.user,
       !!connection.sftp.user && '@',
@@ -86,12 +86,13 @@ export default class Files extends Component {
       '/'
     ].filter(v => v).join('')
 
-    logger.spawn('Files', path, prefix)
+    logger.spawn('Files', `${prefix}${path}`)
     opn(`${prefix}${path}`)
   }
 
   shapize(path, files) {
-    return [path].concat(files.map(file => ` ${file}`))
+    const dirname = p.dirname(files[0] || '')
+    return [p.join(path, dirname)].concat(files.map(file => ` ${file.substr(dirname.length + (dirname === '.' ? -1 : 1))}`))
   }
 
   render() {

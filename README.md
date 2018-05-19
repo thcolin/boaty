@@ -146,13 +146,13 @@ You can customize your configuration in `config.json` file:
       * should listen for `torrent.on('upload')` until limit and then `torrent.pause()` (workable)
 * `@boaty/webtorrent`
   * Fix `ducks.torrents.selected` on `actions.ENHANCE_TORRENTS`
+  * Use `docker` or `pm2` to daemonize daemon
+    * see [pm2 documentation](http://pm2.keymetrics.io/docs/usage/quick-start/)
   * Handle magnet `daemon.import`
   * Confirm modal on `torrents.delete` and `torrents.remove`
   * Investigate for stucked torrents on `daemon.import`
   * Improve `redux` & `websocket` integration with [Redux WebSocket Integration](https://medium.com/@ianovenden/redux-websocket-integration-c1a0d22d3189)
   * Look at [Writing a BitTorrent Client](https://luminarys.com/posts/writing-a-bittorrent-client.html)
-  * Use `docker` or `pm2` to daemonize daemon
-    * see [pm2 documentation](http://pm2.keymetrics.io/docs/usage/quick-start/)
   * `Files` should be able to open distant (`host !== 'localhost'`) files
   * `Daemon` should save torrents state (stoped) and load it on boot
   * Should send `FILL_TORRENTS` every 10s to force update

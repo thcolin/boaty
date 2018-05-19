@@ -154,7 +154,7 @@ export default class Torrents extends Component {
     }
 
     const rows = torrents.map(torrent => [
-      (torrent.stoped ? '◼' : torrent.done ? '✔' : '▶'),
+      (torrent.stoped ? '◼' : torrent.done ? '✔' : !torrent.ready ? '●' : '▶'),
       torrent.name,
       (torrent.done || torrent.stoped ? '-' : humanize.speed(torrent.downloadSpeed)),
       (torrent.stoped ? '-' : humanize.speed(torrent.uploadSpeed)),

@@ -227,7 +227,7 @@ class Daemon extends EventEmitter {
 
   delete(hash) {
     const torrent = this.remove(hash)
-    const path = torrent ? p.resolve(torrent.path, torrent.files.shift().split(p.sep).shift()) : null
+    const path = torrent ? p.resolve(torrent.path, torrent.files[0].split(p.sep).shift()) : null
 
     if (torrent && path && fs.existsSync(path) && path !== p.resolve(this.paths.download)) {
       this.emit('delete', path)

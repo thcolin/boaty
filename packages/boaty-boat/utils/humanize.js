@@ -9,6 +9,6 @@ humanize.duration = (ms = 0) => {
 		{ value: (Math.floor(ms / 1000) % 60), suffix: 's' },
 	]
   .filter(obj => obj.value)
-  .map((obj, index, arr) => `${(index === arr.length - 1 ? obj.value.toString().padStart(2, '0') : obj.value)}${obj.suffix}`)
+  .map(obj => `${obj.value}${obj.suffix}`)
   .join(' ')
 }
